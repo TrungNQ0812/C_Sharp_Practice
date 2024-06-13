@@ -37,40 +37,54 @@ public class P0011Test {
     }
 
     @Test
-    public void testIsBinary() {
+    public void testIsBinary1() {
          // Valid binary input
         assertTrue(main.isBinary("1010"));
-        
+    }
+    @Test
+    public void testIsBinary2() {
         // Invalid binary input
         assertFalse(main.isBinary("1020"));
-        
+    }
+    @Test
+    public void testIsBinary3() {
         // Empty input
         assertFalse(main.isBinary(""));
     }
 
     @Test
-    public void testIsHexadecimal() {
+    public void testIsHexadecimal1() {
          // Valid hexadecimal input
         assertTrue(main.isHexadecimal("A1F"));
-        
+    }
+    @Test
+    public void testIsHexadecimal2() {
         // Invalid hexadecimal input
         assertFalse(main.isHexadecimal("GHI"));
-        
+    }
+    @Test
+    public void testIsHexadecimal3() {
         // Input with prefix 0x
         assertTrue(main.isHexadecimal("0xA1F"));
-        
+    }
+    @Test
+    public void testIsHexadecimal4() {
         // Empty input
         assertFalse(main.isHexadecimal(""));
     }
 
     @Test
-    public void testIsDecimal() {
+    public void testIsDecimal1() {
          // Valid decimal input
         assertTrue(main.isDecimal("123"));
-        
+    }
+    @Test
+    public void testIsDecimal2() {
         // Invalid decimal input
         assertFalse(main.isDecimal("12A3"));
-        
+    }
+    @Test
+    public void testIsDecimal3() {
         // Empty input
         assertFalse(main.isDecimal(""));
     }
