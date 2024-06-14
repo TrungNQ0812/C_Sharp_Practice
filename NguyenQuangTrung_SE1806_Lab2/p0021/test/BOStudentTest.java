@@ -131,15 +131,22 @@ public class BOStudentTest {
     }
 
     @Test
-    public void testIsExistedId() {
+    public void testIsExistedId1() {
         assertTrue(bo.isExistedId("S001"));
+    }
+    @Test
+    public void testIsExistedId2() {
         assertFalse(bo.isExistedId("S999"));
     }
 
     @Test
-    public void testGetStudentById() {
+    public void testGetStudentById1() {
         Student student = bo.getStudentById("S001");
         assertNotNull(student);
+    }
+    @Test
+    public void testGetStudentById2() {
+        Student student = bo.getStudentById("S001");
         assertEquals("S001", student.getId());
     }
 

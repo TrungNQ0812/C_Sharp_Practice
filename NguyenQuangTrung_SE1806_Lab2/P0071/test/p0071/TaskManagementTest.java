@@ -25,17 +25,21 @@ public class TaskManagementTest {
     }
 
     @Test
-    public void testIsEmptyList() {
+    public void testIsEmptyList1() {
          assertTrue(taskManagement.isEmptyList());
-        
+    }
+    @Test
+    public void testIsEmptyList2() {
         taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
         assertFalse(taskManagement.isEmptyList());
     }
 
     @Test
-    public void testGetTaskList() {
+    public void testGetTaskList1() {
         assertEquals(0, taskManagement.getTaskList().size());
-
+    }
+    @Test
+    public void testGetTaskList2() {
         taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
         assertEquals(1, taskManagement.getTaskList().size());
     }
@@ -49,13 +53,17 @@ public class TaskManagementTest {
     }
 
     @Test
-    public void testAddTask() {
+    public void testAddTask1() {
          int id1 = taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
         assertEquals(1, id1);
-
+    }
+    @Test
+    public void testAddTask2() {
         int id2 = taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
         assertEquals(-1, id2);  // Duplicate task
-
+    }
+    @Test
+    public void testAddTask3() {
         int id3 = taskManagement.addTask("1", "Task2", "2023-06-14", 10.0, 12.0, "Charlie", "Dave");
         assertEquals(2, id3);
     }
