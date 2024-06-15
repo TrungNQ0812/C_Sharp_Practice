@@ -5,10 +5,6 @@ public class EastAsiaCountries extends Country {
     public EastAsiaCountries() {
     }
 
-    public EastAsiaCountries(String countryTertain) {
-        this.countryTertain = countryTertain;
-    }
-
     public EastAsiaCountries(String countryCode, String countryName, float totalArea, String countryTertain) {
         super(countryCode, countryName, totalArea);
         this.countryTertain = countryTertain;

@@ -22,8 +22,8 @@ public class BO_Manage_The_GeographicTest {
     }
 
     @Test
-    public void testAddCountryInformation() throws Exception {
-        EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
+    public void testAddCountryInformation1() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "VietNam", 331212, "S-shaped country");
         EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
 
         boManageTheGeographic.addCountryInformation(country1);
@@ -31,7 +31,7 @@ public class BO_Manage_The_GeographicTest {
 
         List<EastAsiaCountries> countries = boManageTheGeographic.searchInformationByName("");
         assertEquals(2, countries.size());
-        assertEquals("Vietnam", countries.get(0).getCountryName());
+        assertEquals("VietNam", countries.get(0).getCountryName());
         assertEquals("Japan", countries.get(1).getCountryName());
 
         // Test for duplicate entry
@@ -44,9 +44,72 @@ public class BO_Manage_The_GeographicTest {
     }
 
     @Test
-    public void testGetRecentlyEnteredInformation() throws Exception {
-        EastAsiaCountries country = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
-        boManageTheGeographic.addCountryInformation(country);
+    public void testAddCountryInformation2() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "VietNam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("VN", "Japan", 377975, "Island nation");
+
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+
+        List<EastAsiaCountries> countries = boManageTheGeographic.searchInformationByName("");
+        assertEquals(2, countries.size());
+        assertEquals("VietNam", countries.get(0).getCountryName());
+        assertEquals("Japan", countries.get(1).getCountryName());
+
+        // Test for duplicate entry
+        try {
+            boManageTheGeographic.addCountryInformation(country1);
+            fail("Expected an Exception to be thrown");
+        } catch (Exception e) {
+            assertEquals("Country you just enter almost exists!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testAddCountryInformation3() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "VietNam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "VietNam", 377975, "Island nation");
+
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+
+        List<EastAsiaCountries> countries = boManageTheGeographic.searchInformationByName("");
+        assertEquals(2, countries.size());
+        assertEquals("VietNam", countries.get(0).getCountryName());
+        assertEquals("Japan", countries.get(1).getCountryName());
+
+        // Test for duplicate entry
+        try {
+            boManageTheGeographic.addCountryInformation(country1);
+            fail("Expected an Exception to be thrown");
+        } catch (Exception e) {
+            assertEquals("Country you just enter almost exists!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testAddCountryInformation4() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "VietNam", 377975, "Island nation");
+
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+
+        // Test for duplicate entry
+        try {
+            boManageTheGeographic.addCountryInformation(country1);
+            fail("Expected an Exception to be thrown");
+        } catch (Exception e) {
+            assertEquals("Country you just enter almost exists or empty fields!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetRecentlyEnteredInformation1() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
 
         EastAsiaCountries recentCountry = boManageTheGeographic.getRecentlyEnteredInformation();
         assertNotNull(recentCountry);
@@ -54,7 +117,19 @@ public class BO_Manage_The_GeographicTest {
     }
 
     @Test
-    public void testSearchInformationByName() throws Exception {
+    public void testGetRecentlyEnteredInformation2() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+
+        EastAsiaCountries recentCountry = boManageTheGeographic.getRecentlyEnteredInformation();
+        assertNotNull(recentCountry);
+        assertEquals("Japan", recentCountry.getCountryName());
+    }
+
+    @Test
+    public void testSearchInformationByName1() throws Exception {
         EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
         EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
 
@@ -66,22 +141,57 @@ public class BO_Manage_The_GeographicTest {
         assertEquals(1, result.size());
         assertEquals("Vietnam", result.get(0).getCountryName());
 
-        // Test search by partial name
-        result = boManageTheGeographic.searchInformationByName("Jap");
-        assertEquals(1, result.size());
-        assertEquals("Japan", result.get(0).getCountryName());
-
-        // Test search with empty string
-        result = boManageTheGeographic.searchInformationByName("");
-        assertEquals(2, result.size());
-
-        // Test search with no matching results
-        result = boManageTheGeographic.searchInformationByName("China");
-        assertTrue(result.isEmpty());
     }
 
     @Test
-    public void testSortInformationByAscendingOrder() throws Exception {
+    public void testSearchInformationByName2() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
+
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+
+        List<EastAsiaCountries> result;
+
+        // Test search by partial name
+        result = boManageTheGeographic.searchInformationByName("Jap");
+        assertEquals(1, result.size());
+        assertEquals("VietNam", result.get(0).getCountryName());
+    }
+
+    @Test
+    public void testSearchInformationByName3() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
+
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+
+        List<EastAsiaCountries> result;
+        // Test search with empty string
+        result = boManageTheGeographic.searchInformationByName("");
+        assertEquals(1, result.size());
+        assertEquals("", result.get(0).getCountryName());
+    }
+
+    @Test
+    public void testSearchInformationByName4() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
+
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+
+        List<EastAsiaCountries> result;
+
+        // Test search with no matching results
+        result = boManageTheGeographic.searchInformationByName("China");
+        assertEquals(1, result.size());
+        assertEquals("China", result.get(0).getCountryName());
+    }
+
+    @Test
+    public void testSortInformationByAscendingOrder1() throws Exception {
         EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
         EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
         EastAsiaCountries country3 = new EastAsiaCountries("CN", "China", 9596961, "Largest country in East Asia");
@@ -96,5 +206,23 @@ public class BO_Manage_The_GeographicTest {
         assertEquals("Japan", sortedCountries[1].getCountryName());
         assertEquals("Vietnam", sortedCountries[2].getCountryName());
     }
+    @Test
+    public void testSortInformationByAscendingOrder2() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "Vietnam", 331212, "S-shaped country");
+        EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
+        EastAsiaCountries country3 = new EastAsiaCountries("CN", "China", 9596961, "Largest country in East Asia");
+
+        boManageTheGeographic.addCountryInformation(country1);
+        boManageTheGeographic.addCountryInformation(country2);
+        boManageTheGeographic.addCountryInformation(country3);
+
+        EastAsiaCountries[] sortedCountries = boManageTheGeographic.sortInformationByAscendingOrder();
+        assertEquals(3, sortedCountries.length);
+        assertEquals("China", sortedCountries[1].getCountryName());
+        assertEquals("Japan", sortedCountries[0].getCountryName());
+        assertEquals("Vietnam", sortedCountries[2].getCountryName());
+    }
+
+
 
 }

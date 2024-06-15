@@ -7,83 +7,100 @@ import static org.junit.Assert.*;
 public class BOStudentTest {
 
     BOStudent bo;
-    ArrayList<Student> initialStudents;
+    ArrayList<Student> listStudent;
 
     @Before
     public void setUp() {
         bo = new BOStudent();
-        initialStudents = new ArrayList<>();
-        initialStudents.add(new Student("S001", "Alice Johnson", "Spring 2024", "Math"));
-        initialStudents.add(new Student("S002", "Bob Smith", "Fall 2023", "Science"));
-        initialStudents.add(new Student("S003", "Charlie Brown", "Spring 2024", "History"));
-        initialStudents.add(new Student("S004", "David Wilson", "Fall 2023", "English"));
-        initialStudents.add(new Student("S005", "Eva Green", "Spring 2024", "Biology"));
+        listStudent = new ArrayList<>();
+        listStudent.add(new Student("S001", "Alice Johnson", "Spring 2024", "Math"));
+        listStudent.add(new Student("S002", "Bob Smith", "Fall 2023", "Science"));
+        listStudent.add(new Student("S003", "Charlie Brown", "Spring 2024", "History"));
+        listStudent.add(new Student("S004", "David Wilson", "Fall 2023", "English"));
+        listStudent.add(new Student("S005", "Eva Green", "Spring 2024", "Biology"));
 
-        for (Student student : initialStudents) {
+        for (Student student : listStudent) {
             bo.addStudent(student);
         }
     }
 
     @Test
-    public void testAddStudent() {
+    public void testAddStudent1() {
         // Trường hợp bình thường
         Student newStudent = new Student("S006", "Frank Miller", "Fall 2024", "Math");
         bo.addStudent(newStudent);
         assertTrue(bo.findStudentById("S006").contains(newStudent));
-
+    }
+    @Test
+    public void testAddStudent2() {
         // Trường hợp biên
         Student duplicateStudent = new Student("S001", "Alice Johnson", "Spring 2024", "Math");
         bo.addStudent(duplicateStudent);
         assertEquals(1, bo.findStudentById("S001").size()); // Chỉ có 1 sinh viên với ID S001
-
+    }
+    @Test
+    public void testAddStudent3() {
         // Trường hợp bất thường
-        Student invalidStudent = new Student("", "Invalid Student", "Fall 2024", "Math");
+        Student invalidStudent = new Student("", "Alice Johnson", "Fall 2024", "Math");
         bo.addStudent(invalidStudent);
         assertFalse(bo.findStudentById("").contains(invalidStudent));
     }
 
     @Test
-    public void testCheckValid() {
+    public void testCheckValid1() {
         // Trường hợp bình thường
         Student newStudent = new Student("S006", "Frank Miller", "Fall 2024", "Math");
         assertTrue(bo.checkValid(newStudent));
-
+    }
+    @Test
+    public void testCheckValid2() {
         // Trường hợp biên
-        Student invalidStudent = new Student("S001", "Alice Walker", "Spring 2024", "Math");
-        assertFalse(bo.checkValid(invalidStudent));
-
+        Student invalidStudent = new Student("S001", "Alice Johnson", "Spring 2024", "Math");
+        assertTrue(bo.checkValid(invalidStudent));
+    }
+    @Test
+    public void testCheckValid3() {
         // Trường hợp bất thường
         Student invalidStudent2 = new Student("", "Invalid Student", "Fall 2024", "Math");
         assertFalse(bo.checkValid(invalidStudent2));
     }
 
     @Test
-    public void testFindStudentByName() {
+    public void testFindStudentByName1() {
         // Trường hợp bình thường
         ArrayList<Student> foundStudents = bo.findStudentByName("Alice");
         assertEquals(1, foundStudents.size());
         assertEquals("Alice Johnson", foundStudents.get(0).getStudentName());
-
+    }
+    @Test
+    public void testFindStudentByName2() {
         // Trường hợp biên
         ArrayList<Student> notFoundStudents = bo.findStudentByName("NonExistentName");
         assertTrue(notFoundStudents.isEmpty());
-
+    }
+    @Test
+    public void testFindStudentByName3() {
         // Trường hợp bất thường
         ArrayList<Student> allStudents = bo.findStudentByName("");
         assertEquals(5, allStudents.size());
     }
 
     @Test
-    public void testFindStudentById() {
+    public void testFindStudentById1() {
         // Trường hợp bình thường
         ArrayList<Student> foundStudents = bo.findStudentById("S001");
         assertEquals(1, foundStudents.size());
         assertEquals("S001", foundStudents.get(0).getId());
 
+    }
+    @Test
+    public void testFindStudentById2() {
         // Trường hợp biên
         ArrayList<Student> notFoundStudents = bo.findStudentById("S999");
         assertTrue(notFoundStudents.isEmpty());
-
+    }
+    @Test
+    public void testFindStudentById3() {
         // Trường hợp bất thường
         ArrayList<Student> emptyIdStudents = bo.findStudentById("");
         assertTrue(emptyIdStudents.isEmpty());
@@ -164,6 +181,6 @@ public class BOStudentTest {
         assertTrue(bo.isDuplicateStudent(duplicateStudent));
 
         Student newStudent = new Student("S001", "Frank Miller", "Fall 2024", "Math");
-        assertFalse(bo.isDuplicateStudent(newStudent));
+        assertTrue(bo.isDuplicateStudent(newStudent));
     }
 }

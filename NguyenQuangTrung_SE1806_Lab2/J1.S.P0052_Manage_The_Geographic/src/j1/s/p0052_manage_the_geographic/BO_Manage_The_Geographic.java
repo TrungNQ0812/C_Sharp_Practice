@@ -20,7 +20,11 @@ public class BO_Manage_The_Geographic {
                 break;
             }
         }
-        if (!check) {
+        if(country.countryCode.trim().isEmpty() || country.countryName.trim().isEmpty() 
+             || country.getCountryTertain().trim().isEmpty() ){
+            check = true;
+        }
+        if (check == false) {
             countryList.add(country);
             recentlyEnteredCountry = country;
         } else {
