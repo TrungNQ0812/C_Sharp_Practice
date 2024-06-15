@@ -156,6 +156,9 @@ public class P0011 {
             System.out.println(msg);
             
                 Choice = Integer.parseInt(sc.nextLine().trim());
+                if(min >= max){
+                    return -1;
+                }
                 if (Choice < min || Choice > max) {
                     return -1;
                 }
