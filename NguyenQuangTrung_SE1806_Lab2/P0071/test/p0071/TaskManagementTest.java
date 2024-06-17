@@ -115,20 +115,33 @@ public class TaskManagementTest {
     }
 
     @Test
-    public void testRemoveTask() {
+    public void testRemoveTask1() {
         taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
+        assertNotNull(taskManagement.findById(1));
         Task task = taskManagement.findById(1);
         taskManagement.removeTask(task);
         assertNull(taskManagement.findById(1));
     }
+    @Test
+    public void testRemoveTask2() {
+        taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
+        assertNull(taskManagement.findById(999));
+        Task task = taskManagement.findById(999);
+        taskManagement.removeTask(task);
+        assertNull(taskManagement.findById(999));
+    }
 
     @Test
-    public void testCheckDuplicateTask() {
-        Task task1 = new Task(1, "1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
+    public void testCheckDuplicateTask1() {
         taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
 
         Task duplicateTask = new Task(2, "1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
         assertTrue(taskManagement.checkDuplicateTask(duplicateTask));
+    }
+    
+    @Test
+    public void testCheckDuplicateTask2() {
+        taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
 
         Task uniqueTask = new Task(3, "2", "Task2", "2023-06-14", 10.0, 12.0, "Charlie", "Dave");
         assertFalse(taskManagement.checkDuplicateTask(uniqueTask));
