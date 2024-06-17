@@ -6,7 +6,10 @@ import java.util.Comparator;
 public class BOStudent {
 
     private ArrayList<Student> listStudents = new ArrayList<>();
-
+//    public void setup (){
+//        listStudents.add(new Student("S001", "Alice Johnson", "Spring 2024", "Math"));
+//        listStudents.add(new Student("S002", "Bob Smith", "Fall 2023", "Science"));
+//    }
     public void addStudent(Student theStudent) {
         if (checkValid(theStudent)) {
             if (isDuplicateStudent(theStudent) == false) {

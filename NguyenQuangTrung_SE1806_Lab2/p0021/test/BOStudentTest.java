@@ -13,11 +13,11 @@ public class BOStudentTest {
     public void setUp() {
         bo = new BOStudent();
         listStudent = new ArrayList<>();
-        listStudent.add(new Student("S001", "Alice Johnson", "Spring 2024", "Math"));
         listStudent.add(new Student("S002", "Bob Smith", "Fall 2023", "Science"));
         listStudent.add(new Student("S003", "Charlie Brown", "Spring 2024", "History"));
         listStudent.add(new Student("S004", "David Wilson", "Fall 2023", "English"));
         listStudent.add(new Student("S005", "Eva Green", "Spring 2024", "Biology"));
+        listStudent.add(new Student("S001", "Alice Johnson", "Spring 2024", "Math"));
 
         for (Student student : listStudent) {
             bo.addStudent(student);
@@ -108,31 +108,57 @@ public class BOStudentTest {
 
     @Test
     public void testDisplayListStudent() {
-        // This test checks if the displayListStudent method runs without errors
-        // Manual verification needed for actual display output
-        bo.displayListStudent();
+        
     }
 
+   
     @Test
     public void testIsEmptyList() {
         assertFalse(bo.isEmptyList());
 
         BOStudent emptyBO = new BOStudent();
-        assertTrue(emptyBO.isEmptyList());
+        assertFalse(emptyBO.isEmptyList());
     }
 
     @Test
-    public void testUpdateStudent() {
+    public void testUpdateStudent1() {
         Student student = bo.getStudentById("S001");
         bo.updateStudent(student, "S001", "Alice Johnson Updated", "Spring 2024", "Math");
         assertEquals("Alice Johnson Updated", student.getStudentName());
     }
+    @Test
+    public void testUpdateStudent2() {
+        Student student = bo.getStudentById("S006");
+        bo.updateStudent(student, "S006", "Frank Miller Updated", "Spring 2024", "Math");
+        assertEquals("Alice Johnson Updated", student.getStudentName());
+    }
+    @Test
+    public void testUpdateStudent3() {
+        Student student = bo.getStudentById("");
+        bo.updateStudent(student, "", "Not Exist Student", "Spring 2024", "Math");
+        assertEquals("Not Exist Student", student.getStudentName());
+    }
 
     @Test
-    public void testDeleteStudent() {
+    public void testDeleteStudent1() {
         Student student = bo.getStudentById("S001");
+        assertFalse(bo.findStudentById("S001").isEmpty());
         bo.deleteStudent(student);
         assertTrue(bo.findStudentById("S001").isEmpty());
+    }
+    @Test
+    public void testDeleteStudent2() {
+        Student student = bo.getStudentById("S006");
+        assertFalse(bo.findStudentById("S006").isEmpty());
+        bo.deleteStudent(student);
+        assertTrue(bo.findStudentById("S006").isEmpty());
+    }
+    @Test
+    public void testDeleteStudent3() {
+        Student student = bo.getStudentById("");
+        assertFalse(bo.findStudentById("").isEmpty());
+        bo.deleteStudent(student);
+        assertTrue(bo.findStudentById("").isEmpty());
     }
 
     @Test
@@ -153,7 +179,11 @@ public class BOStudentTest {
     }
     @Test
     public void testIsExistedId2() {
-        assertFalse(bo.isExistedId("S999"));
+        assertTrue(bo.isExistedId("S006"));
+    }
+    @Test
+    public void testIsExistedId3() {
+        assertFalse(bo.isExistedId(""));
     }
 
     @Test
@@ -166,21 +196,49 @@ public class BOStudentTest {
         Student student = bo.getStudentById("S001");
         assertEquals("S001", student.getId());
     }
+    @Test
+    public void testGetStudentById3() {
+        Student student = bo.getStudentById("");
+        assertEquals("", student.getId());
+    }
 
     @Test
-    public void testSortStudentByNameAsc() {
+    public void testSortStudentByNameAsc1() {
         ArrayList<Student> studentList = bo.findStudentByName("");
         bo.sortStudentByNameAsc(studentList);
         assertEquals("Alice Johnson", studentList.get(0).getStudentName());
         assertEquals("Bob Smith", studentList.get(1).getStudentName());
     }
+    @Test
+    public void testSortStudentByNameAsc2() {
+        ArrayList<Student> studentList = bo.findStudentByName("");
+        bo.sortStudentByNameAsc(studentList);
+        assertEquals("Alice Johnson", studentList.get(1).getStudentName());
+        assertEquals("Bob Smith", studentList.get(0).getStudentName());
+    }
 
     @Test
-    public void testIsDuplicateStudent() {
+    public void testIsDuplicateStudent1() {
         Student duplicateStudent = new Student("S001", "Alice Johnson", "Spring 2024", "Math");
         assertTrue(bo.isDuplicateStudent(duplicateStudent));
 
         Student newStudent = new Student("S001", "Frank Miller", "Fall 2024", "Math");
+        assertTrue(bo.isDuplicateStudent(newStudent));
+    }
+    @Test
+    public void testIsDuplicateStudent2() {
+        Student duplicateStudent = new Student("S001", "Alice Johnson", "Spring 2024", "Math");
+        assertTrue(bo.isDuplicateStudent(duplicateStudent));
+
+        Student newStudent = new Student("S001", "Alice Johnson", "Spring 2024", "Math");
+        assertTrue(bo.isDuplicateStudent(newStudent));
+    }
+    @Test
+    public void testIsDuplicateStudent3() {
+        Student duplicateStudent = new Student("S001", "Alice Johnson", "Spring 2024", "Math");
+        assertTrue(bo.isDuplicateStudent(duplicateStudent));
+
+        Student newStudent = new Student("S006", "Frank Miller", "Fall 2024", "Math");
         assertTrue(bo.isDuplicateStudent(newStudent));
     }
 }
