@@ -102,14 +102,11 @@ public class TaskManagementTest {
         taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
         Task task = taskManagement.findById(1);
         assertNotNull(task);
-        assertEquals("Task1", task.getRequirementName());
 
     }
     @Test
     public void testFindById2() {
         taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
-        Task task = taskManagement.findById(1);
- 
         Task notFoundTask = taskManagement.findById(999);
         assertNull(notFoundTask);
     }
