@@ -70,7 +70,7 @@ public class TaskManagementTest {
         int id1 = taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
         assertEquals(1, id1);
         int id2 = taskManagement.addTask("1", "Task1", "2023-06-13", 9.0, 11.0, "Alice", "Bob");
-        assertEquals(-1, id2);  // Duplicate task
+        assertEquals(-1, id2);  
     }
 
     @Test
