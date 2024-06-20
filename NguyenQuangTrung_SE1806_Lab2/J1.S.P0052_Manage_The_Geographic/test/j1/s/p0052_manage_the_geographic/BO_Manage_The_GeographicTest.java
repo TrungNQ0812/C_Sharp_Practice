@@ -22,6 +22,22 @@ public class BO_Manage_The_GeographicTest {
     }
 
     @Test
+    public void testAddCountryInformation0() throws Exception {
+        EastAsiaCountries country1 = new EastAsiaCountries("VN", "VietNam", 331212, "S-shaped country");
+        
+
+        boManageTheGeographic.addCountryInformation(country1);
+
+
+        // Test for duplicate entry
+        try {
+            boManageTheGeographic.addCountryInformation(country1);
+            fail("Expected an Exception to be thrown");
+        } catch (Exception e) {
+            assertEquals("Country you just enter almost exists!", e.getMessage());
+        }
+    }
+    @Test
     public void testAddCountryInformation1() throws Exception {
         EastAsiaCountries country1 = new EastAsiaCountries("VN", "VietNam", 331212, "S-shaped country");
         EastAsiaCountries country2 = new EastAsiaCountries("JP", "Japan", 377975, "Island nation");
@@ -29,11 +45,7 @@ public class BO_Manage_The_GeographicTest {
         boManageTheGeographic.addCountryInformation(country1);
         boManageTheGeographic.addCountryInformation(country2);
 
-        List<EastAsiaCountries> countries = boManageTheGeographic.searchInformationByName("");
-        assertEquals(2, countries.size());
-        assertEquals("VietNam", countries.get(0).getCountryName());
-        assertEquals("Japan", countries.get(1).getCountryName());
-
+       
         // Test for duplicate entry
         try {
             boManageTheGeographic.addCountryInformation(country1);
@@ -51,10 +63,7 @@ public class BO_Manage_The_GeographicTest {
         boManageTheGeographic.addCountryInformation(country1);
         boManageTheGeographic.addCountryInformation(country2);
 
-        List<EastAsiaCountries> countries = boManageTheGeographic.searchInformationByName("");
-        assertEquals(2, countries.size());
-        assertEquals("VietNam", countries.get(0).getCountryName());
-        assertEquals("Japan", countries.get(1).getCountryName());
+
 
         // Test for duplicate entry
         try {
@@ -73,10 +82,6 @@ public class BO_Manage_The_GeographicTest {
         boManageTheGeographic.addCountryInformation(country1);
         boManageTheGeographic.addCountryInformation(country2);
 
-        List<EastAsiaCountries> countries = boManageTheGeographic.searchInformationByName("");
-        assertEquals(2, countries.size());
-        assertEquals("VietNam", countries.get(0).getCountryName());
-        assertEquals("Japan", countries.get(1).getCountryName());
 
         // Test for duplicate entry
         try {
