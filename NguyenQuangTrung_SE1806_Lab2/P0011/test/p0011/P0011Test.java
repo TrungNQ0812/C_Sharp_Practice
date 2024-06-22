@@ -56,7 +56,7 @@ public class P0011Test {
     @Test
     public void testIsHexadecimal2() {
         // Invalid hexadecimal input
-        assertTrue(main.isHexadecimal("GHI"));
+        assertFalse(main.isHexadecimal("GHI"));
     }
     @Test
     public void testIsHexadecimal3() {
@@ -66,7 +66,7 @@ public class P0011Test {
     @Test
     public void testIsHexadecimal4() {
         // Empty input
-        assertTrue(main.isHexadecimal(""));
+        assertFalse(main.isHexadecimal(""));
     }
 
     @Test
