@@ -1,0 +1,79 @@
+<!-- app/src/main/res/values/strings.xml -->
+<resources>
+    <string name="app_name">OSS Store</string>
+
+    <!-- Authentication -->
+    <string name="welcome_back">Chào mừng trở lại!</string>
+    <string name="create_account">Tạo tài khoản mới</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="remember_me">Ghi nhớ đăng nhập</string>
+    <string name="dont_have_account">Chưa có tài khoản? </string>
+    <string name="register_now">Đăng ký ngay</string>
+    <string name="already_have_account">Đã có tài khoản? </string>
+    <string name="login_now">Đăng nhập ngay</string>
+    <string name="reset_password">Đặt lại mật khẩu</string>
+    <string name="send_reset_email">Gửi email đặt lại</string>
+
+    <!-- Validation Messages -->
+    <string name="error_invalid_email">Email không hợp lệ</string>
+    <string name="error_password_too_short">Mật khẩu phải có ít nhất 8 ký tự</string>
+    <string name="error_password_mismatch">Mật khẩu xác nhận không khớp</string>
+    <string name="error_field_required">Trường này bắt buộc</string>
+    <string name="error_invalid_phone">Số điện thoại không hợp lệ</string>
+    <string name="error_login_failed">Đăng nhập thất bại</string>
+    <string name="error_register_failed">Đăng ký thất bại</string>
+
+    <!-- Address Management -->
+    <string name="address_management">Quản lý địa chỉ</string>
+    <string name="add_new_address">Thêm địa chỉ mới</string>
+    <string name="edit_address">Chỉnh sửa địa chỉ</string>
+    <string name="delete_address">Xóa địa chỉ</string>
+    <string name="set_as_default">Đặt làm mặc định</string>
+    <string name="default_address">Mặc định</string>
+    <string name="receiver_name">Tên người nhận</string>
+    <string name="street_address">Địa chỉ cụ thể</string>
+    <string name="district">Quận/Huyện</string>
+    <string name="city_province">Tỉnh/Thành phố</string>
+    <string name="postal_code">Mã bưu điện</string>
+    <string name="address_type">Loại địa chỉ</string>
+
+    <!-- Order History -->
+    <string name="order_history">Lịch sử đơn hàng</string>
+    <string name="order_detail">Chi tiết đơn hàng</string>
+    <string name="no_orders_message">Bạn chưa có đơn hàng nào.\nHãy khám phá và mua sắm ngay!</string>
+    <string name="start_shopping">Bắt đầu mua sắm</string>
+    <string name="order_status_pending">Chờ xác nhận</string>
+    <string name="order_status_confirmed">Đã xác nhận</string>
+    <string name="order_status_shipped">Đang giao</string>
+    <string name="order_status_delivered">Đã giao</string>
+    <string name="order_status_cancelled">Đã hủy</string>
+    <string name="cancel_order">Hủy đơn</string>
+    <string name="reorder">Mua lại</string>
+    <string name="view_detail">Chi tiết</string>
+    <string name="order_date">Ngày đặt hàng:</string>
+    <string name="shipping_address">Địa chỉ giao hàng:</string>
+    <string name="payment_method">Phương thức thanh toán:</string>
+    <string name="ordered_products">Sản phẩm đã đặt</string>
+    <string name="order_summary">Tóm tắt đơn hàng</string>
+    <string name="subtotal">Tạm tính:</string>
+    <string name="shipping_fee">Phí vận chuyển:</string>
+    <string name="total_amount">Tổng cộng:</string>
+
+    <!--Product-->
+    <string name="add_new_product">Add New Product</string>
+    <string name="product_name">Product Name</string>
+    <string name="product_quantity">Product Quantity</string>
+    <string name="product_category">Product Category</string>
+    <string name="product_price">Product Price</string>
+    <string name="product_status">Product Status</string>
+    <string name="product_description">Product Description</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
