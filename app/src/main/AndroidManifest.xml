@@ -15,9 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OSS"
         tools:targetApi="31">
-        <activity
-            android:name=".activity.AddProductActivity"
-            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".activity.AddProductActivity"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
