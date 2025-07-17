@@ -65,6 +65,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
         private final ImageView ivProductImage;
         private final TextView tvProductName;
         private final TextView tvProductPrice;
+        private final TextView tvProductStatus;
         private final MaterialButton btnEdit;
         private final MaterialButton btnDelete;
         public AdminProductViewHolder(@NonNull View itemView) {
@@ -72,6 +73,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
             ivProductImage = itemView.findViewById(R.id.iv_product_image);
             tvProductName = itemView.findViewById(R.id.tv_product_name);
             tvProductPrice = itemView.findViewById(R.id.tv_product_price);
+            tvProductStatus = itemView.findViewById(R.id.tv_product_status);
             btnEdit = itemView.findViewById(R.id.btn_edit_product);
             btnDelete = itemView.findViewById(R.id.btn_delete_product);
         }
@@ -82,6 +84,13 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
             formattedPrice = formattedPrice.replace("₫", "").trim() + "₫";
             tvProductPrice.setText(formattedPrice);
             ImageLoader.loadProductImage(itemView.getContext(), product.getImageUrl(), ivProductImage);
+            if (product.isActive()) {
+                tvProductStatus.setText("Active");
+                tvProductStatus.setTextColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.green));
+            } else {
+                tvProductStatus.setText("Inactive");
+                tvProductStatus.setTextColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.red));
+            }
             btnEdit.setOnClickListener(v -> onEditClickListener.onEditClick(product.getId()));
             btnDelete.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(product.getId()));
         }
