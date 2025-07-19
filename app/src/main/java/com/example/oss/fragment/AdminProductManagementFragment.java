@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -11,13 +13,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.oss.R;
 import com.example.oss.adapter.AdminProductAdapter;
 import com.example.oss.dialog.AdminProductEditDialog;
 import com.example.oss.entity.Product;
 import com.example.oss.viewmodel.AdminProductViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.appbar.MaterialToolbar;
+
 import java.util.ArrayList;
 
 public class AdminProductManagementFragment extends Fragment {
@@ -25,11 +29,14 @@ public class AdminProductManagementFragment extends Fragment {
     private AdminProductAdapter adapter;
     private AdminProductViewModel viewModel;
     private FloatingActionButton fabAddProduct;
+    private MaterialToolbar toolbar;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_product_management, container, false);
+        toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
         recyclerView = view.findViewById(R.id.recycler_admin_products);
         fabAddProduct = view.findViewById(R.id.fab_add_product);
         adapter = new AdminProductAdapter(new ArrayList<>(), this::onEditProduct, this::onDeleteProduct);
@@ -48,6 +55,7 @@ public class AdminProductManagementFragment extends Fragment {
     }
 
     private void onEditProduct(int productId) {
+        // TODO: Hiển thị dialog sửa sản phẩm
         Product product = findProductById(productId);
         if (product != null) {
             AdminProductEditDialog dialog = AdminProductEditDialog.newInstance(product);

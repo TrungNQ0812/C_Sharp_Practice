@@ -5,12 +5,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.oss.R;
 import com.example.oss.entity.Product;
 import com.example.oss.util.ImageLoader;
 import com.google.android.material.button.MaterialButton;
+
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -65,16 +68,16 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
         private final ImageView ivProductImage;
         private final TextView tvProductName;
         private final TextView tvProductPrice;
-        private final TextView tvProductStatus;
         private final MaterialButton btnEdit;
         private final MaterialButton btnDelete;
+        private final TextView tvProductStatus;
         public AdminProductViewHolder(@NonNull View itemView) {
             super(itemView);
             ivProductImage = itemView.findViewById(R.id.iv_product_image);
             tvProductName = itemView.findViewById(R.id.tv_product_name);
             tvProductPrice = itemView.findViewById(R.id.tv_product_price);
-            tvProductStatus = itemView.findViewById(R.id.tv_product_status);
             btnEdit = itemView.findViewById(R.id.btn_edit_product);
+            tvProductStatus = itemView.findViewById(R.id.tv_product_status);
             btnDelete = itemView.findViewById(R.id.btn_delete_product);
         }
         public void bind(Product product) {

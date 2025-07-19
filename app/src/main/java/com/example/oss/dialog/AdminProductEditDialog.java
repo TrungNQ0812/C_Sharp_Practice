@@ -6,25 +6,27 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
+
 import com.example.oss.R;
+import com.example.oss.entity.Category;
 import com.example.oss.entity.Product;
+import com.example.oss.repository.CategoryRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
-import androidx.lifecycle.Observer;
-import com.example.oss.entity.Category;
-import com.example.oss.repository.CategoryRepository;
-import java.util.ArrayList;
-import java.util.List;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminProductEditDialog extends DialogFragment {
     private TextInputEditText etName, etDescription, etPrice, etQuantity, etImage;

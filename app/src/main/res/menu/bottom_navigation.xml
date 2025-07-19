@@ -26,4 +26,9 @@
         android:icon="@drawable/ic_person"
         android:title="Tài khoản" />
 
+    <item
+        android:id="@+id/nav_admin"
+        android:icon="@drawable/ic_settings"
+        android:title="Quản trị" />
+
 </menu> 

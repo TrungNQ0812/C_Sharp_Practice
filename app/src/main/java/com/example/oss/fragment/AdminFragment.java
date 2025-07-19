@@ -1,5 +1,6 @@
 package com.example.oss.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,8 +8,16 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.example.oss.R;
+import com.example.oss.activity.CategoryManagementActivity;
+import com.example.oss.activity.UserManagementActivity;
+import com.google.android.material.card.MaterialCardView;
+import com.example.oss.fragment.AdminProductManagementFragment;
+import androidx.lifecycle.ViewModelProvider;
+import android.widget.TextView;
+import android.widget.ImageButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,7 +33,14 @@ public class AdminFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private String mParam1;
-    private String mParam2;
+    private String mParam2;    
+    private MaterialCardView cardManageCategories;
+    private MaterialCardView cardManageOrders;
+    private MaterialCardView cardManageUsers;
+    private MaterialCardView cardManageProducts;
+    private MaterialCardView cardStatistics;
+    private TextView tvAdminStats;
+    private ImageButton btnBackAdmin;
 
     public AdminFragment() {
         // Required empty public constructor
@@ -61,6 +77,66 @@ public class AdminFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin, container, false);
+        View view = inflater.inflate(R.layout.fragment_admin, container, false);
+
+        btnBackAdmin = view.findViewById(R.id.btn_back_admin);
+        btnBackAdmin.setOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
+
+        cardManageCategories = view.findViewById(R.id.card_manage_categories);
+        cardManageOrders = view.findViewById(R.id.card_manage_orders);
+        cardManageUsers = view.findViewById(R.id.card_manage_users);
+        cardManageProducts = view.findViewById(R.id.card_manage_products);
+
+
+        cardStatistics = view.findViewById(R.id.card_statistics);
+        tvAdminStats = view.findViewById(R.id.tv_admin_stats);
+
+
+        // Setup click listeners
+        setupClickListeners();
+        // Không load thống kê tổng quan ở header nữa
+        // loadStatistics();
+        return view;
+    }    private void setupClickListeners() {
+        cardManageCategories.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), CategoryManagementActivity.class);
+            startActivity(intent);
+        });
+        cardManageOrders.setOnClickListener(v -> {
+            OrderManagementFragment fragment = new OrderManagementFragment();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+        cardManageUsers.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), UserManagementActivity.class);
+            startActivity(intent);
+        });
+
+        cardManageProducts.setOnClickListener(v -> {
+            AdminProductManagementFragment fragment = new AdminProductManagementFragment();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+        cardStatistics.setOnClickListener(v -> {
+            StatisticFragment fragment = new StatisticFragment();
+            requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+        });
+    }
+
+    private void loadStatistics() {
+        // TODO: Kết nối ViewModel thực tế để lấy số lượng user, sản phẩm, đơn hàng
+        // Hiện tại demo số liệu giả lập
+        tvAdminStats.setText("Tổng quan: 100 người dùng, 50 sản phẩm, 200 đơn hàng");
+
     }
 }
