@@ -1,5 +1,6 @@
 
 using Microsoft.OpenApi.Models;
+using OfficeOpenXml;
 using PMS.API.DIConfig;
 using PMS.Application.DIConfig;
 using PMS.Application.Filters;
@@ -13,7 +14,7 @@ namespace PMS.API
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            ExcelPackage.License.SetNonCommercialPersonal("hoanganh");
             // Add services to the container.
 
             // DbContext
@@ -38,6 +39,9 @@ namespace PMS.API
             // Services
             builder.Services.AddServices();
 
+            // Infrastructure
+            builder.Services.AddInfrastructure();
+
             // External Services
             builder.Services.AddExternalServices();
 
@@ -50,15 +54,24 @@ namespace PMS.API
             // JWT
             builder.Services.AddJwt(builder.Configuration);
 
+            // Background service
+            builder.Services.AddBackgroundServices();
+
             // cho phep khi dung ajax goi api tu fe den be
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200")
+                    policy.WithOrigins("http://localhost:3000")
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            .AllowAnyMethod()
+                            .AllowCredentials();
                 });
+            });
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString("Redis");
+                options.InstanceName = "PO_Excel_";
             });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -96,11 +109,16 @@ namespace PMS.API
 
             await app.MigrateDatabase();
 
+            app.UseStaticFiles();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+                });
             }
 
             app.UseCors("AllowFrontend");
@@ -117,6 +135,8 @@ namespace PMS.API
 
             //maphub
             app.MapHub<NotificationHub>("/notificationHub");
+
+            app.MapHubs();
 
             app.MapControllers();
 

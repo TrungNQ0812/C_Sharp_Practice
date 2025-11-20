@@ -33,5 +33,11 @@ namespace PMS.Core.Domain.Entities
 
         public virtual Category Category { get; set; } = null!;
         public virtual ICollection<RequestSalesQuotationDetails> RequestSalesQuotationDetails { get; set; } = [];
+
+        public virtual ICollection<PurchasingRequestProduct> PRPS { get; set; } = new List<PurchasingRequestProduct>();
+        public virtual ICollection<LotProduct> LotProducts { get; set; } = new List<LotProduct>();
+        public virtual ICollection<GoodReceiptNoteDetail> GoodReceiptNoteDetails { get; set; } = new List<GoodReceiptNoteDetail>();
+        public virtual ICollection<SalesQuotaionDetails> SalesQuotaionDetails { get; set; } = [];
+        //public virtual ICollection<SalesOrderDetails> SalesOrderDetails { get; set; } = [];
     }
 }

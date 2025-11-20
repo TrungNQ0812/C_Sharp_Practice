@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PMS.Application.DTOs.Auth;
@@ -33,27 +35,70 @@ namespace PMS.Application.Services.User
 
         public async Task<ServiceResult<bool>> RegisterUserAsync(RegisterUser customer)
         {
+            _logger.LogWarning($"=== BẮT ĐẦU ĐĂNG KÝ USER ===");
+            _logger.LogInformation($"Bắt đầu đăng ký user: {customer.Email}");
+
             var validateEmail = await _unitOfWork.Users.UserManager.FindByEmailAsync(customer.Email);
+            _logger.LogInformation($"Kết quả tìm email: {validateEmail?.Email} - EmailConfirmed: {validateEmail?.EmailConfirmed}");
 
             if (validateEmail != null)
             {
-                return new ServiceResult<bool>
+                _logger.LogWarning($"=== EMAIL ĐÃ TỒN TẠI ===");
+                _logger.LogWarning($"Email: {validateEmail.Email}");
+                _logger.LogWarning($"EmailConfirmed: {validateEmail.EmailConfirmed}");
+
+                // Kiểm tra email đã được xác thực hay chưa
+                if (validateEmail.EmailConfirmed)
                 {
-                    StatusCode = 200,
-                    Message = "Trùng email",
-                    Data = false
-                };
+                    _logger.LogWarning($"Email đã được đăng ký: {customer.Email}");
+                    _logger.LogWarning($"Trả về StatusCode 400 với message: Email đã được đăng ký");
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Email đã được đăng ký",
+                        Data = false
+                    };
+                }
+                else
+                {
+                    _logger.LogWarning($"Email chưa xác thực: {customer.Email}");
+                    _logger.LogWarning($"Trả về StatusCode 400 với message: Email chưa xác thực");
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Email chưa xác thực",
+                        Data = false
+                    };
+                }
             }
+
+            _logger.LogInformation($"Email không tồn tại, tiếp tục đăng ký: {customer.Email}");
 
             var validatePhone = await _unitOfWork.Users.Query().FirstOrDefaultAsync(u => u.PhoneNumber == customer.PhoneNumber);
 
             if (validatePhone != null)
+            {
+                _logger.LogWarning($"Số điện thoại đã tồn tại: {customer.PhoneNumber}");
                 return new ServiceResult<bool>
                 {
-                    StatusCode = 200,
+                    StatusCode = 400,
                     Message = "Trùng số điện thoại",
                     Data = false
                 };
+            }
+
+            var validateUsername = await _unitOfWork.Users.UserManager.FindByNameAsync(customer.UserName.ToLower());
+
+            if (validateUsername != null)
+            {
+                _logger.LogWarning($"Tên đăng nhập đã tồn tại: {customer.UserName}");
+                return new ServiceResult<bool>
+                {
+                    StatusCode = 400,
+                    Message = "Tên đăng nhập đã tồn tại",
+                    Data = false
+                };
+            }
 
             var user = new Core.Domain.Identity.User
             {
@@ -66,42 +111,77 @@ namespace PMS.Application.Services.User
                 Avatar = "/images/AvatarDefault.png",
             };
 
+            _logger.LogWarning($"=== TẠO USER ===");
+            _logger.LogWarning($"UserName: {user.UserName}");
+            _logger.LogWarning($"Email: {user.Email}");
+            _logger.LogWarning($"PhoneNumber: {user.PhoneNumber}");
+            _logger.LogWarning($"Password length: {customer.ConfirmPassword?.Length}");
+
             var createResult = await _unitOfWork.Users.UserManager.CreateAsync(user, customer.ConfirmPassword);
+            _logger.LogWarning($"CreateResult.Succeeded: {createResult.Succeeded}");
             if (!createResult.Succeeded)
             {
                 var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-                _logger.LogError("Tao nguoi dung that bai: {Errors}", errors);
+                _logger.LogError("Tạo tài khoản thất bại: {Errors}", errors);
                 return new ServiceResult<bool>
                 {
                     StatusCode = 500,
-                    Message = "có lỗi xảy ra",
+                    Message = "Có lỗi xảy ra",
                     Data = false
                 };
             }
+            _logger.LogWarning($"Tạo user thành công: {user.Email} - ID: {user.Id}");
 
             var customerProfile = new Core.Domain.Entities.CustomerProfile
             {
                 UserId = user.Id
             };
             await _unitOfWork.CustomerProfile.AddAsync(customerProfile);
+            _logger.LogWarning($"Tạo CustomerProfile thành công cho user: {user.Id}");
 
             var roleResult = await _unitOfWork.Users.UserManager.AddToRoleAsync(user, UserRoles.CUSTOMER);
+            _logger.LogWarning($"=== GÁN ROLE ===");
+            _logger.LogWarning($"RoleResult.Succeeded: {roleResult.Succeeded}");
             if (!roleResult.Succeeded)
             {
                 var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-                _logger.LogError("Gan role that bai: {Errors}", errors);
+                _logger.LogError("Gán role thất bại: {Errors}", errors);
                 return new ServiceResult<bool>
                 {
                     StatusCode = 500,
-                    Message = "có lỗi xảy ra",
+                    Message = "Có lỗi xảy ra",
                     Data = false
                 };
             }
+            _logger.LogWarning($"Gán role CUSTOMER thành công cho user: {user.Id}");
 
-            await _unitOfWork.CommitAsync();
+            _logger.LogWarning($"=== COMMIT TRANSACTION ===");
+            try
+            {
+                var result = await _unitOfWork.CommitAsync();
+                _logger.LogWarning($"Commit transaction thành công - Rows affected: {result}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Commit transaction thất bại: {ex.Message}");
+                _logger.LogError($"Exception details: {ex}");
+                throw;
+            }
 
-            await SendEmailConfirmAsync(user);
-            _logger.LogInformation("Gui email xac nhan cho email: {Email}", user.Email);
+            _logger.LogWarning($"=== GỬI EMAIL ===");
+            try
+            {
+                await SendEmailConfirmAsync(user);
+                _logger.LogInformation("Gửi email xác nhận thành công: {Email}", user.Email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Gửi email thất bại: {ex.Message}");
+                // Không throw exception ở đây vì user đã được tạo thành công
+            }
+            _logger.LogWarning($"=== ĐĂNG KÝ THÀNH CÔNG ===");
+            _logger.LogWarning($"Email: {user.Email}");
+            _logger.LogWarning($"Trả về StatusCode 200 với message: Thành công vui lòng kiểm tra email");
             return new ServiceResult<bool>
             {
                 StatusCode = 200,
@@ -113,27 +193,51 @@ namespace PMS.Application.Services.User
 
         public async Task SendEmailConfirmAsync(Core.Domain.Identity.User user)
         {
+            _logger.LogWarning($"=== BẮT ĐẦU GỬI EMAIL ===");
+            _logger.LogWarning($"User Email: {user.Email}");
+            _logger.LogWarning($"User ID: {user.Id}");
+
             // tao token moi voi securiry stamp moi
             string token = await _unitOfWork.Users.UserManager.GenerateEmailConfirmationTokenAsync(user);
+            _logger.LogWarning($"Token generated: {token?.Substring(0, Math.Min(20, token?.Length ?? 0))}...");
 
             UriBuilder uriBuilder = LinkConstant.UriBuilder("User", "confirm-email", user.Id, token);
 
             var link = uriBuilder.ToString();
+            _logger.LogWarning($"Link generated: {link}");
 
             var body = EmailBody.CONFIRM_EMAIL(user.Email, link);
+            _logger.LogWarning($"Email body generated");
 
-            await _emailService.SendMailAsync(EmailSubject.CONFIRM_EMAIL, body, user.Email);
+            _logger.LogWarning($"=== GỬI EMAIL QUA SERVICE ===");
+            try
+            {
+                _logger.LogWarning($"Calling SendMailAsync with subject: {EmailSubject.CONFIRM_EMAIL}");
+                _logger.LogWarning($"Body length: {body?.Length}");
+                _logger.LogWarning($"To email: {user.Email}");
+
+                await _emailService.SendMailAsync(EmailSubject.CONFIRM_EMAIL, body, user.Email);
+                _logger.LogWarning($"Email sent successfully to: {user.Email}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Email service error: {ex.Message}");
+                _logger.LogError($"Exception details: {ex}");
+                throw;
+            }
         }
 
         public async Task<ServiceResult<bool>> ReSendEmailConfirmAsync(ResendConfirmEmailRequest request)
         {
-            var user = await _unitOfWork.Users.UserManager.FindByEmailAsync(request.EmailOrUsername);
+            var user = (request.EmailOrUsername!.Contains('@'))
+                ? await _unitOfWork.Users.UserManager.FindByEmailAsync(request.EmailOrUsername)
+                : await _unitOfWork.Users.UserManager.FindByNameAsync(request.EmailOrUsername);
             if (user == null)
             {
                 return new ServiceResult<bool>
                 {
                     StatusCode = 404,
-                    Message = "sai email",
+                    Message = "Sai email",
                     Data = false
                 };
             }
@@ -147,7 +251,7 @@ namespace PMS.Application.Services.User
             return new ServiceResult<bool>
             {
                 StatusCode = 200,
-                Message = "thành công vui lòng kiểm tra email",
+                Message = "Thành công, vui lòng kiểm tra email",
                 Data = true
             };
         }
@@ -170,7 +274,7 @@ namespace PMS.Application.Services.User
                 return new ServiceResult<bool>
                 {
                     StatusCode = 200,
-                    Message = "Tài khoản đã được xác nhận trước đó",
+                    Message = "Tài khoản đã được xác nhận thành công",
                     Data = false
                 };
 
@@ -233,7 +337,7 @@ namespace PMS.Application.Services.User
             return new ServiceResult<bool>
             {
                 StatusCode = 200,
-                Message = "Thành công vui lòng kiểm tra mail",
+                Message = "Thành công vui lòng kiểm tra email",
                 Data = true
             };
         }
@@ -244,7 +348,7 @@ namespace PMS.Application.Services.User
 
             if (user == null)
             {
-                _logger.LogWarning("Khong tim thay user id cua nguoi dung");
+                _logger.LogWarning("Không tìm thấy user id của người dùng");
                 return new ServiceResult<bool>
                 {
                     StatusCode = 404,
@@ -258,11 +362,11 @@ namespace PMS.Application.Services.User
             if (!result.Succeeded)
             {
                 var errors = string.Join("; ", result.Errors.Select(e => e.Description));
-                _logger.LogWarning("Dat lai mat khau loi: {Erros}", errors);
+                _logger.LogWarning("Đặt lại mật khẩu lỗi: {Erros}", errors);
                 return new ServiceResult<bool>
                 {
                     StatusCode = 500,
-                    Message = "đặt lại mật khẩu thất bại",
+                    Message = "Đặt lại mật khẩu thất bại",
                     Data = false
                 };
             }
@@ -273,7 +377,7 @@ namespace PMS.Application.Services.User
             return new ServiceResult<bool>
             {
                 StatusCode = 200,
-                Message = "thành công",
+                Message = "Đặt lại mật khẩu thành công",
                 Data = true
             };
         }
@@ -290,7 +394,7 @@ namespace PMS.Application.Services.User
                     return new ServiceResult<bool>
                     {
                         Data = false,
-                        Message = "không tìm thấy userId hoặc đã bị khóa",
+                        Message = "Không tìm thấy userId hoặc đã bị khóa",
                         StatusCode = 200,
                     };
                 }
@@ -327,7 +431,6 @@ namespace PMS.Application.Services.User
             }
 
         }
-
 
         public async Task<ServiceResult<IEnumerable<CustomerDTO>>> GetAllCustomerWithInactiveStatus()
         {
@@ -368,7 +471,7 @@ namespace PMS.Application.Services.User
             }
         }
 
-        public async Task<ServiceResult<bool>> UpdateCustomerStatus(string userId,string managerId)
+        public async Task<ServiceResult<bool>> UpdateCustomerStatus(string userId, string managerId)
         {
             var exuser = await _unitOfWork.Users.Query()
                     .Include(u => u.CustomerProfile).FirstOrDefaultAsync(u => u.Id == userId);
@@ -384,15 +487,15 @@ namespace PMS.Application.Services.User
                 senderId: managerId,
                 userId,
                 title: "Thông báo duyệt tài khoản",
-                message: $"tài khoản đã cập nhật ",
+                message: $"Tài khoản đã cập nhật ",
                 type: NotificationType.System);
 
             return new ServiceResult<bool>
             {
                 Data = true,
-                Message = "cập nhật thành công",
+                Message = "Cập nhật thành công",
                 StatusCode = 200,
-            };  
+            };
         }
 
         public async Task<ServiceResult<CustomerViewDTO>> GetCustomerByIdAsync(string userId)
@@ -439,6 +542,327 @@ namespace PMS.Application.Services.User
             };
         }
 
+        public async Task<ServiceResult<bool>> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
+        {
+            try
+            {
+                var user = await _unitOfWork.Users.UserManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return new ServiceResult<bool>
+                    {
+                        Data = false,
+                        Message = $"Không tìm thấy người dùng với ID: {userId}",
+                        StatusCode = 404
+                    };
+                }
 
+
+                var result = await _unitOfWork.Users.UserManager.ChangePasswordAsync(user, oldPassword, newPassword);
+                if (!result.Succeeded)
+                {
+
+                    var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                    return new ServiceResult<bool>
+                    {
+                        Data = false,
+                        Message = $"Đổi mật khẩu thất bại: {errors}",
+                        StatusCode = 400
+                    };
+                }
+
+                return new ServiceResult<bool>
+                {
+                    Data = true,
+                    Message = "Đổi mật khẩu thành công.",
+                    StatusCode = 200
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error changing password: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<ServiceResult<object>> GetProfile(string userId, List<string> roles)
+        {
+            try
+            {
+                var result = await GetProfileByRoleAsync(userId, roles);
+
+                return new ServiceResult<object>
+                {
+                    StatusCode = 200,
+                    Data = result,
+                };
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Loi");
+                return new ServiceResult<object>
+                {
+                    StatusCode = 500,
+                    Message = "Lỗi"
+                };
+            }
+        }
+
+        private async Task<object> GetProfileByRoleAsync(string userId, List<string> roles)
+        {
+            var query = _unitOfWork.Users.Query();
+
+            if (roles.Contains(UserRoles.SALES_STAFF) || roles.Contains(UserRoles.ACCOUNTANT) 
+                || roles.Contains(UserRoles.PURCHASES_STAFF) || roles.Contains(UserRoles.WAREHOUSE_STAFF))
+            {
+                var staff = await query.Include(u => u.StaffProfile)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+                return _mapper.Map<DTOs.Profile.StaffProfileDTO>(staff);
+            }
+
+            if (roles.Contains(UserRoles.CUSTOMER))
+            {
+                var customer = await query.Include(u => u.CustomerProfile)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+                return _mapper.Map<DTOs.Profile.CustomerProfileDTO>(customer);
+            }
+
+            var common = await query.FirstOrDefaultAsync(u => u.Id == userId);
+            return _mapper.Map<DTOs.Profile.CommonProfileDTO>(common);
+        }
+
+        public async Task<ServiceResult<CustomerStatusDTO>> GetCustomerStatusAsync(string userId)
+        {
+            try
+            {
+                _logger.LogInformation($"Kiểm tra trạng thái customer: {userId}");
+
+                // Kiểm tra user có tồn tại không
+                var user = await _unitOfWork.Users.UserManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning($"Không tìm thấy user với ID: {userId}");
+                    return new ServiceResult<CustomerStatusDTO>
+                    {
+                        StatusCode = 404,
+                        Message = "Không tìm thấy người dùng",
+                        Data = null
+                    };
+                }
+
+                // Kiểm tra user có phải customer không
+                var roles = await _unitOfWork.Users.UserManager.GetRolesAsync(user);
+                if (!roles.Contains(UserRoles.CUSTOMER))
+                {
+                    _logger.LogWarning($"User {userId} không phải customer");
+                    return new ServiceResult<CustomerStatusDTO>
+                    {
+                        StatusCode = 403,
+                        Message = "Chỉ customer mới có thể kiểm tra trạng thái",
+                        Data = null
+                    };
+                }
+
+                // Kiểm tra customer profile
+                var customerProfile = await _unitOfWork.CustomerProfile.Query()
+                    .FirstOrDefaultAsync(cp => cp.UserId == userId);
+
+                var hasAdditionalInfo = customerProfile != null &&
+                                       customerProfile.Mst.HasValue &&
+                                       customerProfile.Mshkd.HasValue &&
+                                       !string.IsNullOrEmpty(customerProfile.ImageCnkd);
+
+                var needsAdditionalInfo = !hasAdditionalInfo;
+
+                var statusDTO = new CustomerStatusDTO
+                {
+                    UserStatus = user.UserStatus,
+                    HasAdditionalInfo = hasAdditionalInfo,
+                    NeedsAdditionalInfo = needsAdditionalInfo,
+                    Message = user.UserStatus switch
+                    {
+                        UserStatus.Block => "Tài khoản của bạn đã bị khóa",
+                        UserStatus.Inactive => hasAdditionalInfo ? "Thông tin của bạn đang chờ manager duyệt" : "Bạn cần bổ sung thông tin mã số thuế và mã số kinh doanh",
+                        UserStatus.Active => "Tài khoản của bạn đã được kích hoạt",
+                        _ => "Trạng thái không xác định"
+                    }
+                };
+
+                _logger.LogInformation($"Trạng thái customer {userId}: {statusDTO.UserStatus}, HasAdditionalInfo: {statusDTO.HasAdditionalInfo}");
+                return new ServiceResult<CustomerStatusDTO>
+                {
+                    StatusCode = 200,
+                    Message = "Lấy trạng thái thành công",
+                    Data = statusDTO
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Lỗi khi kiểm tra trạng thái customer: {userId}");
+                return new ServiceResult<CustomerStatusDTO>
+                {
+                    StatusCode = 500,
+                    Message = "Có lỗi xảy ra khi kiểm tra trạng thái",
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<ServiceResult<bool>> SubmitCustomerAdditionalInfoAsync(string userId, CustomerAdditionalInfoDTO additionalInfo)
+        {
+            try
+            {
+                _logger.LogInformation($"Bắt đầu submit thông tin bổ sung cho customer: {userId}");
+
+                // Kiểm tra user có tồn tại không
+                var user = await _unitOfWork.Users.UserManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning($"Không tìm thấy user với ID: {userId}");
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 404,
+                        Message = "Không tìm thấy người dùng",
+                        Data = false
+                    };
+                }
+
+                // Kiểm tra user có phải customer không
+                var roles = await _unitOfWork.Users.UserManager.GetRolesAsync(user);
+                if (!roles.Contains(UserRoles.CUSTOMER))
+                {
+                    _logger.LogWarning($"User {userId} không phải customer");
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 403,
+                        Message = "Chỉ customer mới có thể submit thông tin bổ sung",
+                        Data = false
+                    };
+                }
+
+                // Kiểm tra customer profile có tồn tại không
+                var customerProfile = await _unitOfWork.CustomerProfile.Query()
+                    .FirstOrDefaultAsync(cp => cp.UserId == userId);
+
+                if (customerProfile == null)
+                {
+                    _logger.LogWarning($"Không tìm thấy customer profile cho user: {userId}");
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 404,
+                        Message = "Không tìm thấy thông tin customer",
+                        Data = false
+                    };
+                }
+
+                // Kiểm tra customer đã submit thông tin bổ sung chưa
+                if (customerProfile.Mst.HasValue && customerProfile.Mshkd.HasValue)
+                {
+                    _logger.LogWarning($"Customer {userId} đã submit thông tin bổ sung");
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Bạn đã submit thông tin bổ sung rồi",
+                        Data = false
+                    };
+                }
+
+                // Validate MST và MSHKD format
+                if (additionalInfo.Mst <= 0 || additionalInfo.Mst.ToString().Length != 10)
+                {
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Mã số thuế phải có đúng 10 chữ số",
+                        Data = false
+                    };
+                }
+
+                if (additionalInfo.Mshkd <= 0 || additionalInfo.Mshkd.ToString().Length != 10)
+                {
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Mã số kinh doanh phải có đúng 10 chữ số",
+                        Data = false
+                    };
+                }
+
+                // Validate address
+                if (string.IsNullOrWhiteSpace(additionalInfo.Address))
+                {
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Địa chỉ không được để trống",
+                        Data = false
+                    };
+                }
+
+                if (additionalInfo.Address.Length > 256)
+                {
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Địa chỉ không được vượt quá 256 ký tự",
+                        Data = false
+                    };
+                }
+
+                // Validate ImageCnkd
+                if (string.IsNullOrWhiteSpace(additionalInfo.ImageCnkd))
+                {
+                    return new ServiceResult<bool>
+                    {
+                        StatusCode = 400,
+                        Message = "Ảnh chứng nhận kinh doanh là bắt buộc",
+                        Data = false
+                    };
+                }
+
+                // Cập nhật thông tin bổ sung
+                customerProfile.Mst = additionalInfo.Mst;
+                customerProfile.Mshkd = additionalInfo.Mshkd;
+                customerProfile.ImageCnkd = additionalInfo.ImageCnkd;
+                // Không cập nhật ImageByt nữa
+
+                // Cập nhật địa chỉ của user
+                user.Address = additionalInfo.Address;
+
+                // Cập nhật trạng thái user thành Inactive để chờ manager duyệt
+                user.UserStatus = UserStatus.Inactive;
+
+                _unitOfWork.CustomerProfile.Update(customerProfile);
+                await _unitOfWork.Users.UserManager.UpdateAsync(user);
+                await _unitOfWork.CommitAsync();
+
+                // Gửi thông báo cho manager
+                await _notificationService.SendNotificationToRolesAsync(
+                    userId, // senderId
+                    new List<string> { UserRoles.MANAGER }, // targetRoles
+                    "Yêu cầu duyệt thông tin customer",
+                    $"Customer {user.UserName} đã submit thông tin bổ sung và cần được duyệt",
+                    NotificationType.System
+                );
+
+                _logger.LogInformation($"Submit thông tin bổ sung thành công cho customer: {userId}");
+                return new ServiceResult<bool>
+                {
+                    StatusCode = 200,
+                    Message = "Submit thông tin bổ sung thành công. Vui lòng chờ manager duyệt.",
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Lỗi khi submit thông tin bổ sung cho customer: {userId}");
+                return new ServiceResult<bool>
+                {
+                    StatusCode = 500,
+                    Message = "Có lỗi xảy ra khi submit thông tin bổ sung",
+                    Data = false
+                };
+            }
+        }
     }
 }
+

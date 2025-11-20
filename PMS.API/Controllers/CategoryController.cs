@@ -9,7 +9,7 @@ namespace PMS.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoryController : BaseController
     {
         private readonly ICategoryService _categoryService;
 
@@ -69,5 +69,88 @@ namespace PMS.API.Controllers
                 data = result.Data
             });
         }
+
+        /// <summary>
+        /// https://localhost:7213/api/Category/updatecategory
+        /// Cập nhật thông tin danh mục sản phẩm
+        /// </summary>
+        [HttpPut("updatecategory")]
+        [Authorize(Roles = UserRoles.PURCHASES_STAFF)]
+        public async Task<IActionResult> UpdateCategoryAsync([FromBody] CategoryDTO category)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _categoryService.UpdateCategoryAsync(category);
+                return HandleServiceResult(result); 
+            }
+            catch (ArgumentException ex)
+            {
+                return HandleServiceResult(new ServiceResult<bool>
+                {
+                    Data = false,
+                    Message = ex.Message,
+                    StatusCode = 400
+                });
+            }
+            catch (Exception ex)
+            {
+                return HandleServiceResult(new ServiceResult<bool>
+                {
+                    Data = false,
+                    Message = $"Đã xảy ra lỗi hệ thống khi cập nhật danh mục: {ex.Message}",
+                    StatusCode = 500
+                });
+            }
+        }
+
+        /// <summary>
+        /// https://localhost:7213/api/Category/toggleStatus/{cateId}
+        /// </summary>
+        /// <param name="cateId"></param>
+        /// <returns></returns>
+        [HttpPut("toggleStatus/{cateId}")]
+        [Authorize(Roles = UserRoles.PURCHASES_STAFF)]
+        public async Task<IActionResult> ToggleCategoryStatus(int cateId)
+        {
+            try
+            {
+                var result = await _categoryService.ActiveSupplierAsync(cateId);
+
+                if (result.StatusCode == 404)
+                    return NotFound(result);
+
+                if (result.StatusCode == 500)
+                    return StatusCode(500, result);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Data = false,
+                    Message = $"Đã xảy ra lỗi trong quá trình xử lý: {ex.Message}"
+                });
+            }
+        }
+
+
+        /// <summary>
+        /// Xóa danh mục khi không có sản phẩm liên quan
+        /// https://localhost:7213/api/Category/Delete/{cateId}
+        /// </summary>
+        /// <param name="cateId">ID của danh mục cần xóa</param>
+        /// <returns>Kết quả xóa danh mục</returns>
+        [HttpDelete("Delete/{cateId}")]
+        [Authorize(Roles = UserRoles.PURCHASES_STAFF)]
+        public async Task<IActionResult> DeleteCategory(int cateId)
+        {
+            var result = await _categoryService.DeleteCategoriesWithNoReference(cateId);
+            return HandleServiceResult(result);
+        }
+
     }
 }

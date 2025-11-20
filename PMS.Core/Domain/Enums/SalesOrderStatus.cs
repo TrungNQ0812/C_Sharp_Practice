@@ -8,9 +8,13 @@ namespace PMS.Core.Domain.Enums
 {
     public enum SalesOrderStatus : byte
     {
-        Draft = 0, 
+        Draft = 0,
         Send = 1,
-        Confirmed = 2,
-        Cancelled = 3
+        Approved =2,
+        Rejected = 3,
+        Delivered = 4,
+        Complete = 5,
+        NotComplete = 6,
+
     }
 }

@@ -1,15 +1,59 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using PMS.Application.DTOs.Category;
+using PMS.Application.DTOs.Product;
 using PMS.Application.Services.Base;
 using PMS.Core.Domain.Constant;
-using PMS.Application.DTOs.Category;
 using PMS.Data.UnitOfWork;
-using Microsoft.Extensions.Configuration;
 
 namespace PMS.Application.Services.Category
 {
-    public class CategoryService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration) : Service(unitOfWork, mapper), ICategoryService
+    public class CategoryService(IUnitOfWork unitOfWork, IMapper mapper) : Service(unitOfWork, mapper), ICategoryService
     {
+        public async Task<ServiceResult<bool>> ActiveSupplierAsync(int cateId)
+        {
+            try
+            {
+
+                var excate = await _unitOfWork.Category.Query()
+                    .FirstOrDefaultAsync(c => c.CategoryID == cateId);
+
+                if (excate == null)
+                {
+                    return new ServiceResult<bool>
+                    {
+                        Data = false,
+                        Message = $"Không tìm thấy loại sản phẩm với ID: {cateId}",
+                        StatusCode = 404
+                    };
+                }
+
+
+                excate.Status = !excate.Status;
+
+
+                _unitOfWork.Category.Update(excate);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResult<bool>
+                {
+                    Data = true,
+                    Message = $"Đã {(excate.Status ? "kích hoạt" : "vô hiệu hóa")} loại sản phẩm thành công.",
+                    StatusCode = 200
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<bool>
+                {
+                    Data = false,
+                    Message = $"Đã xảy ra lỗi: {ex.Message}",
+                    StatusCode = 500
+                };
+            }
+        }
+
         public async Task<ServiceResult<bool>> AddAsync(CategoryDTO category)
         {
             try
@@ -18,9 +62,9 @@ namespace PMS.Application.Services.Category
                 {
                     return new ServiceResult<bool>
                     {
-                        StatusCode=500,
-                        Message="kiểm tra lại dữ liệu",
-                        Data=false
+                        StatusCode = 500,
+                        Message = "kiểm tra lại dữ liệu",
+                        Data = false
                     };
                 }
 
@@ -40,6 +84,7 @@ namespace PMS.Application.Services.Category
                 {
                     Name = category.Name,
                     Description = category.Description,
+                    Status = true,
                 };
 
                 await _unitOfWork.Category.AddAsync(newcategory);
@@ -66,6 +111,40 @@ namespace PMS.Application.Services.Category
             }
         }
 
+        public async Task<ServiceResult<bool>> DeleteCategoriesWithNoReference(int cateId)
+        {
+            var cate = await _unitOfWork.Category.Query().Include(c => c.Products).FirstOrDefaultAsync(ct => ct.CategoryID == cateId);
+            if (cate == null)
+            {
+                return new ServiceResult<bool>
+                {
+                    Data = false,
+                    StatusCode = 404,
+                    Message = $"Danh mục với {cateId} không tồn tại",
+                    Success = false,
+                };
+            }
+            if (cate.Products != null && cate.Products.Any())
+            {
+                return new ServiceResult<bool>
+                {
+                    Data = false,
+                    StatusCode = 400,
+                    Message = "Không thể xóa danh mục vì vẫn còn sản phẩm liên quan",
+                    Success = false
+                };
+            }
+            _unitOfWork.Category.Remove(cate);
+            await _unitOfWork.CommitAsync();
+            return new ServiceResult<bool>
+            {
+                Data = true,
+                StatusCode = 200,
+                Message = "Thành công",
+                Success = true,
+            };
+        }
+
         public async Task<ServiceResult<IEnumerable<CategoryDTO>>> GetAllAsync()
         {
 
@@ -77,6 +156,7 @@ namespace PMS.Application.Services.Category
                     CategoryID = p.CategoryID,
                     Name = p.Name,
                     Description = p.Description,
+                    Status = p.Status,
                 }).ToList();
 
 
@@ -115,7 +195,7 @@ namespace PMS.Application.Services.Category
                         Data = null
                     };
                 }
-                var category = await _unitOfWork.Category.Query().FirstOrDefaultAsync(p => p.CategoryID == id);
+                var category = await _unitOfWork.Category.Query().Include(c => c.Products).FirstOrDefaultAsync(p => p.CategoryID == id);
 
                 if (category == null)
                 {
@@ -129,9 +209,24 @@ namespace PMS.Application.Services.Category
 
                 var categorydto = new CategoryDTO
                 {
-                    CategoryID=category.CategoryID,
+                    CategoryID = category.CategoryID,
                     Name = category.Name,
                     Description = category.Description,
+                    Status = category.Status,
+
+                    Products = category.Products.Select(p => new ProductDTO
+                    {
+                        ProductID = p.ProductID,
+                        ProductName = p.ProductName,
+                        ProductDescription = p.ProductDescription,
+                        Unit = p.Unit,
+                        CategoryID = p.CategoryID,
+                        Image = p.Image,
+                        MinQuantity = p.MinQuantity,
+                        MaxQuantity = p.MaxQuantity,
+                        TotalCurrentQuantity = p.TotalCurrentQuantity,
+                        Status = p.Status
+                    }).ToList()
                 };
 
                 return new ServiceResult<CategoryDTO>()
@@ -155,5 +250,38 @@ namespace PMS.Application.Services.Category
             }
         }
 
+        public async Task<ServiceResult<bool>> UpdateCategoryAsync(CategoryDTO category)
+        {
+
+            try
+            {
+                var excate = await _unitOfWork.Category.Query().FirstOrDefaultAsync(e => e.CategoryID == category.CategoryID);
+                if (excate == null)
+                {
+                    return new ServiceResult<bool>()
+                    {
+                        Data = false,
+                        Message = $"Không tìm thấy categoryID:{category.CategoryID}",
+                        StatusCode = 200,
+                    };
+                }
+
+                excate.Name = category.Name;
+                excate.Description = category.Description;
+                excate.Status = category.Status;
+                _unitOfWork.Category.Update(excate);
+                await _unitOfWork.CommitAsync();
+                return new ServiceResult<bool>()
+                {
+                    Data = true,
+                    Message = $"CategoryID={category.CategoryID} đã update thành công",
+                    StatusCode = 200,
+                };
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException($"Lỗi khi lấy thông tin thể loại sản phẩm: {ex.Message}", ex);
+            }
+        }
     }
 }

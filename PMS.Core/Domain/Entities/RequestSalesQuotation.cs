@@ -12,10 +12,11 @@ namespace PMS.Core.Domain.Entities
         public int Id { get; set; }
         public int CustomerId {  get; set; }
         public string RequestCode { get; set; } = string.Empty;
-        public DateTime RequestDate { get; set; }
+        public DateTime? RequestDate { get; set; }
         public RequestSalesQuotationStatus Status { get; set; }
 
         public virtual CustomerProfile CustomerProfile { get; set; } = null!;
         public virtual ICollection<RequestSalesQuotationDetails> RequestSalesQuotationDetails { get; set; } = [];
+        public virtual ICollection<SalesQuotation>? SalesQuotations { get; set; }
     }
 }

@@ -1,15 +1,16 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using PMS.Application.DTOs.Product;
 using PMS.Application.Services.Base;
 using PMS.Core.Domain.Constant;
-using PMS.Application.DTOs.Product;
 using PMS.Data.UnitOfWork;
-using Microsoft.Extensions.Configuration;
 
 namespace PMS.Application.Services.Product
 {
-    public class ProductService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration) : Service(unitOfWork, mapper), IProductService
-    
+    public class ProductService(IUnitOfWork unitOfWork, IMapper mapper) : Service(unitOfWork, mapper), IProductService
+
     {
         public async Task<ServiceResult<bool>> AddProductAsync(ProductDTO product)
         {
@@ -108,6 +109,7 @@ namespace PMS.Application.Services.Product
                 var products = await _unitOfWork.Product.GetAllAsync();
                 var productList = products.Select(p => new ProductDTO
                 {
+                    ProductID = p.ProductID,
                     ProductName = p.ProductName,
                     ProductDescription = p.ProductDescription,
                     CategoryID = p.CategoryID,
@@ -150,6 +152,7 @@ namespace PMS.Application.Services.Product
                     .Where(p => p.Status == true)
                     .Select(p => new ProductDTO
                     {
+                        ProductID = p.ProductID,
                         ProductName = p.ProductName,
                         ProductDescription = p.ProductDescription,
                         CategoryID = p.CategoryID,
@@ -208,6 +211,7 @@ namespace PMS.Application.Services.Product
 
                 var productUpdate = new ProductDTO
                 {
+                    ProductID = product.ProductID,
                     ProductName = product.ProductName,
                     ProductDescription = product.ProductDescription,
                     Unit = product.Unit,
@@ -256,7 +260,6 @@ namespace PMS.Application.Services.Product
                     };
                 }
 
-
                 var product = await _unitOfWork.Product.Query().FirstOrDefaultAsync(p => p.ProductID == productId);
                 if (product == null)
                 {
@@ -267,7 +270,6 @@ namespace PMS.Application.Services.Product
                         Data = false
                     };
                 }
-
 
                 product.Status = status;
 
@@ -291,7 +293,7 @@ namespace PMS.Application.Services.Product
             }
         }
 
-        public async Task <ServiceResult<bool>> UpdateProductAsync(int id, ProductUpdateDTO productUpdate)
+        public async Task<ServiceResult<bool>> UpdateProductAsync(int id, ProductUpdateDTO productUpdate)
         {
             try
             {
@@ -381,7 +383,81 @@ namespace PMS.Application.Services.Product
 
             }
         }
+        public async Task<ServiceResult<List<ProductDTO>>> SearchProductByKeyWordAsync(string keyWord)
+        {
+            var products = await _unitOfWork.Product
+                .Query()
+                .AsNoTracking()
+                .Where(c => c.ProductName.Contains(keyWord))
+                .Select(p => new ProductDTO
+                {
+                    ProductID = p.ProductID,
+                    ProductName = p.ProductName,
+                    Unit = p.Unit,
+                    CategoryID = p.CategoryID,
+                    MaxQuantity = p.MaxQuantity,
+                    MinQuantity = p.MinQuantity,
+                    TotalCurrentQuantity = p.TotalCurrentQuantity,
+                    Image = p.Image,
+                    ProductDescription = p.ProductDescription,
+                    Status = p.Status
+                    
+                })
+                .ToListAsync();
 
+            if (!products.Any())
+            {
+                return new ServiceResult<List<ProductDTO>>
+                {
+                    Data = new List<ProductDTO>(),
+                    Success = false,
+                    Message = $"Không tồn tại sản phẩm nào với keyword '{keyWord}'",
+                    StatusCode = 404
+                };
+            }
 
+            return new ServiceResult<List<ProductDTO>>
+            {
+                Data = products,
+                Success = true,
+                Message = "Thành công",
+                StatusCode = 200
+            };
+        }
+
+        public async Task<ServiceResult<List<LotProductDTO2>>> GetLotProductByProductId(int productId)
+        {
+            try
+            {
+                var products = await _unitOfWork.LotProduct.Query()
+                    .Where(p => p.ProductID == productId)
+                    .Include(p => p.Product)
+                    .ToListAsync();
+
+                if (!products.Any())
+                    return ServiceResult<List<LotProductDTO2>>.Fail("Không tìm thấy lô hàng nào cho sản phẩm này.");
+
+                var result = products.Select(p => new LotProductDTO2
+                {
+                    LotID = p.LotID,
+                    InputDate = p.InputDate,
+                    SalePrice = p.SalePrice,
+                    InputPrice = p.InputPrice,
+                    ProductName = p.Product?.ProductName ?? "Unknown",
+                    ExpiredDate = p.ExpiredDate,
+                    LotQuantity = p.LotQuantity,
+                    SupplierID = p.SupplierID,
+                    ProductID = p.ProductID,
+                    WarehouselocationID = p.WarehouselocationID,
+                    LastCheckedDate = p.LastCheckedDate
+                }).ToList();
+
+                return ServiceResult<List<LotProductDTO2>>.SuccessResult(result, "Lấy danh sách lô hàng thành công.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<List<LotProductDTO2>>.Fail($"Lỗi khi lấy lô sản phẩm: {ex.Message}");
+            }
+        }
     }
 }

@@ -175,9 +175,44 @@ namespace PMS.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
                     b.HasKey("CategoryID");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.CustomerDebt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("DebtAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("status")
+                        .HasColumnType("TINYINT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("SalesOrderId")
+                        .IsUnique();
+
+                    b.ToTable("CustomerDebts");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.CustomerProfile", b =>
@@ -210,6 +245,386 @@ namespace PMS.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("CustomerProfiles");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.DebtReport", b =>
+                {
+                    b.Property<int>("ReportID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReportID"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("CurrentDebt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<int?>("EntityID")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int>("EntityType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Payables")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime?>("Payday")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReportID");
+
+                    b.HasIndex("EntityType", "EntityID")
+                        .HasDatabaseName("IX_DebtReport_Entity");
+
+                    b.ToTable("DebtReports", (string)null);
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodReceiptNote", b =>
+                {
+                    b.Property<int>("GRNID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GRNID"));
+
+                    b.Property<string>("CreateBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("POID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("warehouseID")
+                        .HasColumnType("int");
+
+                    b.HasKey("GRNID");
+
+                    b.HasIndex("POID");
+
+                    b.ToTable("GoodReceiptNotes");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodReceiptNoteDetail", b =>
+                {
+                    b.Property<int>("GRNDID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GRNDID"));
+
+                    b.Property<int>("GRNID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("GRNDID");
+
+                    b.HasIndex("GRNID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("GoodReceiptNoteDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodsIssueNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreateBy")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DeliveryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExportedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GoodsIssueNoteCode")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<int>("StockExportOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateBy");
+
+                    b.HasIndex("StockExportOrderId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("GoodsIssueNotes");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodsIssueNoteDetails", b =>
+                {
+                    b.Property<int>("GoodsIssueNoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LotId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("GoodsIssueNoteId", "LotId");
+
+                    b.HasIndex("LotId");
+
+                    b.ToTable("GoodsIssueNoteDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.InventoryHistory", b =>
+                {
+                    b.Property<int>("InventoryHistoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InventoryHistoryID"));
+
+                    b.Property<int>("ActualQuantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("InventoryBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("InventorySessionID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("LotID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("SystemQuantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("InventoryHistoryID");
+
+                    b.HasIndex("InventorySessionID");
+
+                    b.HasIndex("LotID");
+
+                    b.ToTable("InventoryHistories", (string)null);
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.InventorySession", b =>
+                {
+                    b.Property<int>("InventorySessionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InventorySessionID"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("int");
+
+                    b.HasKey("InventorySessionID");
+
+                    b.ToTable("InventorySessions", (string)null);
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InvoiceCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("IssuedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalDeposit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalPaid")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalRemain")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.InvoiceDetail", b =>
+                {
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GoodsIssueNoteId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("AllocatedDeposit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("GoodsIssueAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("NoteBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PaidRemain")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalPaidForNote")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("InvoiceId", "GoodsIssueNoteId");
+
+                    b.HasIndex("GoodsIssueNoteId");
+
+                    b.ToTable("InvoiceDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.LotProduct", b =>
+                {
+                    b.Property<int>("LotID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LotID"));
+
+                    b.Property<DateTime>("ExpiredDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("InputDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("InputPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("LastCheckedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LotQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SalePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SupplierID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouselocationID")
+                        .HasColumnType("int");
+
+                    b.HasKey("LotID");
+
+                    b.HasIndex("ProductID");
+
+                    b.HasIndex("SupplierID");
+
+                    b.HasIndex("WarehouselocationID");
+
+                    b.ToTable("LotProducts");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.Notification", b =>
@@ -256,6 +671,83 @@ namespace PMS.Data.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PaymentRemain", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Gateway")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("GatewayTransactionRef")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("GoodsIssueNoteId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("PaymentMethod")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<byte>("PaymentType")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("TINYINT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GoodsIssueNoteId")
+                        .IsUnique()
+                        .HasFilter("[GoodsIssueNoteId] IS NOT NULL");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.ToTable("PaymentRemains");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PharmacySecretInfor", b =>
+                {
+                    b.Property<int>("PMSID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DebtCeiling")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("decimal(18,2)")
+                        .HasComputedColumnSql("(([TotalRecieve] - [TotalPaid]) + [Equity]) * 3", true)
+                        .HasComment("Nợ trần");
+
+                    b.Property<decimal>("Equity")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Vốn chủ sở hữu");
+
+                    b.Property<decimal>("TotalPaid")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Tổng chi");
+
+                    b.Property<decimal>("TotalRecieve")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Tổng thu");
+
+                    b.HasKey("PMSID");
+
+                    b.ToTable("PharmacySecretInfor", (string)null);
+                });
+
             modelBuilder.Entity("PMS.Core.Domain.Entities.Product", b =>
                 {
                     b.Property<int>("ProductID")
@@ -268,6 +760,7 @@ namespace PMS.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Image")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaxQuantity")
@@ -302,6 +795,246 @@ namespace PMS.Data.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingOrder", b =>
+                {
+                    b.Property<int>("POID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("POID"));
+
+                    b.Property<decimal>("Debt")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Deposit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("DepositDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentDueDate")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("POID");
+
+                    b.HasIndex("QID");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PurchasingOrders");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingOrderDetail", b =>
+                {
+                    b.Property<int>("PODID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PODID"));
+
+                    b.Property<string>("DVT")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("ExpiredDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("POID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPriceTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PODID");
+
+                    b.HasIndex("POID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("PurchasingOrderDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingRequestForQuotation", b =>
+                {
+                    b.Property<int>("PRFQID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PRFQID"));
+
+                    b.Property<string>("MyAddress")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("MyPhone")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplierID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TaxCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PRFQID");
+
+                    b.HasIndex("SupplierID");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PurchasingRequestForQuotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingRequestProduct", b =>
+                {
+                    b.Property<int>("PRPID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PRPID"));
+
+                    b.Property<int>("PRFQID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.HasKey("PRPID");
+
+                    b.HasIndex("PRFQID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("PurchasingRequestProducts");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.Quotation", b =>
+                {
+                    b.Property<int>("QID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PRFQID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("QuotationExpiredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SendDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplierID")
+                        .HasColumnType("int");
+
+                    b.HasKey("QID");
+
+                    b.HasIndex("PRFQID")
+                        .IsUnique();
+
+                    b.ToTable("Quotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.QuotationDetail", b =>
+                {
+                    b.Property<int>("QDID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QDID"));
+
+                    b.Property<DateTime>("ProductDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("ProductDescription")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ProductUnit")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("QID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("QDID");
+
+                    b.HasIndex("QID");
+
+                    b.ToTable("QuotationDetails");
+                });
+
             modelBuilder.Entity("PMS.Core.Domain.Entities.RequestSalesQuotation", b =>
                 {
                     b.Property<int>("Id")
@@ -318,7 +1051,7 @@ namespace PMS.Data.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<DateTime>("RequestDate")
+                    b.Property<DateTime?>("RequestDate")
                         .HasColumnType("datetime2");
 
                     b.Property<byte>("Status")
@@ -344,6 +1077,229 @@ namespace PMS.Data.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("RequestSalesQuotationDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesOrder", b =>
+                {
+                    b.Property<int>("SalesOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SalesOrderId"));
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("date");
+
+                    b.Property<string>("CreateBy")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsDeposited")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("PaidAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte>("PaymentStatus")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<string>("SalesOrderCode")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<DateTime>("SalesOrderExpiredDate")
+                        .HasColumnType("date");
+
+                    b.Property<byte>("SalesOrderStatus")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<int>("SalesQuotationId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("SalesOrderId");
+
+                    b.HasIndex("CreateBy");
+
+                    b.HasIndex("SalesQuotationId");
+
+                    b.ToTable("SalesOrders");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesOrderDetails", b =>
+                {
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LotId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SubTotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("SalesOrderId", "LotId");
+
+                    b.HasIndex("LotId");
+
+                    b.ToTable("SalesOrderDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotaionDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("LotId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SqId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TaxId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LotId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("SqId");
+
+                    b.HasIndex("TaxId");
+
+                    b.ToTable("SalesQuotaionDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DepositDueDays")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DepositPercent")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ExpiredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("QuotationCode")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime?>("QuotationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RsqId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SqnId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SsId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("TINYINT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RsqId");
+
+                    b.HasIndex("SqnId");
+
+                    b.HasIndex("SsId");
+
+                    b.ToTable("SalesQuotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotationComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<int>("SqId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SqId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SalesQuotationComments");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotationNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SalesQuotationNotes");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.StaffProfile", b =>
@@ -372,6 +1328,63 @@ namespace PMS.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("StaffProfiles");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.StockExportOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreateBy")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<string>("StockExportOrderCode")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateBy");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.ToTable("StockExportOrders");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.StockExportOrderDetails", b =>
+                {
+                    b.Property<int>("StockExportOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LotId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("StockExportOrderId", "LotId");
+
+                    b.HasIndex("LotId");
+
+                    b.ToTable("StockExportOrderDetails");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.Supplier", b =>
@@ -418,6 +1431,35 @@ namespace PMS.Data.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("PMS.Core.Domain.Entities.TaxPolicy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<decimal>("Rate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaxPolicies");
+                });
+
             modelBuilder.Entity("PMS.Core.Domain.Entities.Warehouse", b =>
                 {
                     b.Property<int>("Id")
@@ -436,8 +1478,8 @@ namespace PMS.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<byte>("Status")
-                        .HasColumnType("TINYINT");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -452,17 +1494,13 @@ namespace PMS.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ColumnNo")
-                        .HasColumnType("int");
+                    b.Property<string>("LocationName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("LevelNo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RowNo")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("Status")
-                        .HasColumnType("TINYINT");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<int>("WarehouseId")
                         .HasColumnType("int");
@@ -483,6 +1521,7 @@ namespace PMS.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -628,6 +1667,22 @@ namespace PMS.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PMS.Core.Domain.Entities.CustomerDebt", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.CustomerProfile", null)
+                        .WithMany("CustomerDebts")
+                        .HasForeignKey("CustomerId")
+                        .HasPrincipalKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.SalesOrder", null)
+                        .WithOne("CustomerDebts")
+                        .HasForeignKey("PMS.Core.Domain.Entities.CustomerDebt", "SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PMS.Core.Domain.Entities.CustomerProfile", b =>
                 {
                     b.HasOne("PMS.Core.Domain.Identity.User", "User")
@@ -637,6 +1692,158 @@ namespace PMS.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodReceiptNote", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.PurchasingOrder", "PurchasingOrder")
+                        .WithMany("GoodReceiptNotes")
+                        .HasForeignKey("POID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PurchasingOrder");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodReceiptNoteDetail", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.GoodReceiptNote", "GoodReceiptNote")
+                        .WithMany("GoodReceiptNoteDetails")
+                        .HasForeignKey("GRNID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.Product", "Product")
+                        .WithMany("GoodReceiptNoteDetails")
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GoodReceiptNote");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodsIssueNote", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Identity.User", "WarehouseStaff")
+                        .WithMany("GoodsIssueNotes")
+                        .HasForeignKey("CreateBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.StockExportOrder", "StockExportOrder")
+                        .WithMany("GoodsIssueNotes")
+                        .HasForeignKey("StockExportOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.Warehouse", "Warehouse")
+                        .WithMany("GoodsIssueNotes")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("StockExportOrder");
+
+                    b.Navigation("Warehouse");
+
+                    b.Navigation("WarehouseStaff");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodsIssueNoteDetails", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.GoodsIssueNote", "GoodsIssueNote")
+                        .WithMany("GoodsIssueNoteDetails")
+                        .HasForeignKey("GoodsIssueNoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.LotProduct", "LotProduct")
+                        .WithMany("GoodsIssueNoteDetails")
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GoodsIssueNote");
+
+                    b.Navigation("LotProduct");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.InventoryHistory", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.InventorySession", "InventorySession")
+                        .WithMany("InventoryHistories")
+                        .HasForeignKey("InventorySessionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.LotProduct", "LotProduct")
+                        .WithMany("InventoryHistories")
+                        .HasForeignKey("LotID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("InventorySession");
+
+                    b.Navigation("LotProduct");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.Invoice", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.SalesOrder", "SalesOrder")
+                        .WithMany("Invoice")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.InvoiceDetail", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.GoodsIssueNote", "GoodsIssueNote")
+                        .WithMany("InvoiceDetails")
+                        .HasForeignKey("GoodsIssueNoteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.Invoice", "Invoice")
+                        .WithMany("InvoiceDetails")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GoodsIssueNote");
+
+                    b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.LotProduct", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.Product", "Product")
+                        .WithMany("LotProducts")
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.Supplier", "Supplier")
+                        .WithMany("LotProducts")
+                        .HasForeignKey("SupplierID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.WarehouseLocation", "WarehouseLocation")
+                        .WithMany("LotProducts")
+                        .HasForeignKey("WarehouselocationID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Supplier");
+
+                    b.Navigation("WarehouseLocation");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.Notification", b =>
@@ -658,6 +1865,24 @@ namespace PMS.Data.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PaymentRemain", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.GoodsIssueNote", "GoodsIssueNote")
+                        .WithOne("PaymentRemain")
+                        .HasForeignKey("PMS.Core.Domain.Entities.PaymentRemain", "GoodsIssueNoteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PMS.Core.Domain.Entities.SalesOrder", "SalesOrder")
+                        .WithMany("PaymentRemains")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GoodsIssueNote");
+
+                    b.Navigation("SalesOrder");
+                });
+
             modelBuilder.Entity("PMS.Core.Domain.Entities.Product", b =>
                 {
                     b.HasOne("PMS.Core.Domain.Entities.Category", "Category")
@@ -667,6 +1892,104 @@ namespace PMS.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingOrder", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.Quotation", "Quotations")
+                        .WithMany("PurchasingOrders")
+                        .HasForeignKey("QID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Identity.User", "User")
+                        .WithMany("PurchasingOrders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Quotations");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingOrderDetail", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.PurchasingOrder", "PurchasingOrder")
+                        .WithMany("PurchasingOrderDetails")
+                        .HasForeignKey("POID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("PurchasingOrder");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingRequestForQuotation", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.Supplier", "Supplier")
+                        .WithMany("PurchasingRequestForQuotations")
+                        .HasForeignKey("SupplierID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Identity.User", "User")
+                        .WithMany("PurchasingRequestForQuotations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingRequestProduct", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.PurchasingRequestForQuotation", "PRFQ")
+                        .WithMany("PRPS")
+                        .HasForeignKey("PRFQID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.Product", "Product")
+                        .WithMany("PRPS")
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PRFQ");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.Quotation", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.PurchasingRequestForQuotation", "PurchasingRequestForQuotation")
+                        .WithOne("Quotation")
+                        .HasForeignKey("PMS.Core.Domain.Entities.Quotation", "PRFQID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PurchasingRequestForQuotation");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.QuotationDetail", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.Quotation", "Quotation")
+                        .WithMany("QuotationDetails")
+                        .HasForeignKey("QID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quotation");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.RequestSalesQuotation", b =>
@@ -699,6 +2022,123 @@ namespace PMS.Data.Migrations
                     b.Navigation("RequestSalesQuotation");
                 });
 
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesOrder", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Identity.User", "Customer")
+                        .WithMany("SalesOrders")
+                        .HasForeignKey("CreateBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.SalesQuotation", "SalesQuotation")
+                        .WithMany("SalesOrders")
+                        .HasForeignKey("SalesQuotationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("SalesQuotation");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesOrderDetails", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.LotProduct", "LotProduct")
+                        .WithMany("SalesOrderDetails")
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.SalesOrder", "SalesOrder")
+                        .WithMany("SalesOrderDetails")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LotProduct");
+
+                    b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotaionDetails", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.LotProduct", "LotProduct")
+                        .WithMany("SalesQuotaionDetails")
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("PMS.Core.Domain.Entities.Product", "Product")
+                        .WithMany("SalesQuotaionDetails")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.SalesQuotation", "SalesQuotation")
+                        .WithMany("SalesQuotaionDetails")
+                        .HasForeignKey("SqId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.TaxPolicy", "TaxPolicy")
+                        .WithMany("SalesQuotaionDetails")
+                        .HasForeignKey("TaxId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("LotProduct");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("SalesQuotation");
+
+                    b.Navigation("TaxPolicy");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotation", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.RequestSalesQuotation", "RequestSalesQuotation")
+                        .WithMany("SalesQuotations")
+                        .HasForeignKey("RsqId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.SalesQuotationNote", "SalesQuotationNote")
+                        .WithMany("SalesQuotations")
+                        .HasForeignKey("SqnId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.StaffProfile", "StaffProfile")
+                        .WithMany("SalesQuotations")
+                        .HasForeignKey("SsId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RequestSalesQuotation");
+
+                    b.Navigation("SalesQuotationNote");
+
+                    b.Navigation("StaffProfile");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotationComment", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.SalesQuotation", "SalesQuotation")
+                        .WithMany("SalesQuotationComments")
+                        .HasForeignKey("SqId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Identity.User", "User")
+                        .WithMany("SalesQuotationComments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SalesQuotation");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PMS.Core.Domain.Entities.StaffProfile", b =>
                 {
                     b.HasOne("PMS.Core.Domain.Identity.User", "User")
@@ -708,6 +2148,44 @@ namespace PMS.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.StockExportOrder", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Identity.User", "SalesStaff")
+                        .WithMany("StockExportOrders")
+                        .HasForeignKey("CreateBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.SalesOrder", "SalesOrder")
+                        .WithMany("StockExportOrders")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SalesOrder");
+
+                    b.Navigation("SalesStaff");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.StockExportOrderDetails", b =>
+                {
+                    b.HasOne("PMS.Core.Domain.Entities.LotProduct", "LotProduct")
+                        .WithMany("StockExportOrderDetails")
+                        .HasForeignKey("LotId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PMS.Core.Domain.Entities.StockExportOrder", "StockExportOrder")
+                        .WithMany("StockExportOrderDetails")
+                        .HasForeignKey("StockExportOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LotProduct");
+
+                    b.Navigation("StockExportOrder");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.WarehouseLocation", b =>
@@ -728,33 +2206,175 @@ namespace PMS.Data.Migrations
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.CustomerProfile", b =>
                 {
+                    b.Navigation("CustomerDebts");
+
                     b.Navigation("RequestSalesQuotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodReceiptNote", b =>
+                {
+                    b.Navigation("GoodReceiptNoteDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.GoodsIssueNote", b =>
+                {
+                    b.Navigation("GoodsIssueNoteDetails");
+
+                    b.Navigation("InvoiceDetails");
+
+                    b.Navigation("PaymentRemain");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.InventorySession", b =>
+                {
+                    b.Navigation("InventoryHistories");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.Invoice", b =>
+                {
+                    b.Navigation("InvoiceDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.LotProduct", b =>
+                {
+                    b.Navigation("GoodsIssueNoteDetails");
+
+                    b.Navigation("InventoryHistories");
+
+                    b.Navigation("SalesOrderDetails");
+
+                    b.Navigation("SalesQuotaionDetails");
+
+                    b.Navigation("StockExportOrderDetails");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.Product", b =>
                 {
+                    b.Navigation("GoodReceiptNoteDetails");
+
+                    b.Navigation("LotProducts");
+
+                    b.Navigation("PRPS");
+
                     b.Navigation("RequestSalesQuotationDetails");
+
+                    b.Navigation("SalesQuotaionDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingOrder", b =>
+                {
+                    b.Navigation("GoodReceiptNotes");
+
+                    b.Navigation("PurchasingOrderDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.PurchasingRequestForQuotation", b =>
+                {
+                    b.Navigation("PRPS");
+
+                    b.Navigation("Quotation")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.Quotation", b =>
+                {
+                    b.Navigation("PurchasingOrders");
+
+                    b.Navigation("QuotationDetails");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.RequestSalesQuotation", b =>
                 {
                     b.Navigation("RequestSalesQuotationDetails");
+
+                    b.Navigation("SalesQuotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesOrder", b =>
+                {
+                    b.Navigation("CustomerDebts")
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("PaymentRemains");
+
+                    b.Navigation("SalesOrderDetails");
+
+                    b.Navigation("StockExportOrders");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotation", b =>
+                {
+                    b.Navigation("SalesOrders");
+
+                    b.Navigation("SalesQuotaionDetails");
+
+                    b.Navigation("SalesQuotationComments");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.SalesQuotationNote", b =>
+                {
+                    b.Navigation("SalesQuotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.StaffProfile", b =>
+                {
+                    b.Navigation("SalesQuotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.StockExportOrder", b =>
+                {
+                    b.Navigation("GoodsIssueNotes");
+
+                    b.Navigation("StockExportOrderDetails");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.Supplier", b =>
+                {
+                    b.Navigation("LotProducts");
+
+                    b.Navigation("PurchasingRequestForQuotations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.TaxPolicy", b =>
+                {
+                    b.Navigation("SalesQuotaionDetails");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Entities.Warehouse", b =>
                 {
+                    b.Navigation("GoodsIssueNotes");
+
                     b.Navigation("WarehouseLocations");
+                });
+
+            modelBuilder.Entity("PMS.Core.Domain.Entities.WarehouseLocation", b =>
+                {
+                    b.Navigation("LotProducts");
                 });
 
             modelBuilder.Entity("PMS.Core.Domain.Identity.User", b =>
                 {
                     b.Navigation("CustomerProfile");
 
+                    b.Navigation("GoodsIssueNotes");
+
+                    b.Navigation("PurchasingOrders");
+
+                    b.Navigation("PurchasingRequestForQuotations");
+
                     b.Navigation("ReceivedNotifications");
+
+                    b.Navigation("SalesOrders");
+
+                    b.Navigation("SalesQuotationComments");
 
                     b.Navigation("SentNotifications");
 
                     b.Navigation("StaffProfile");
+
+                    b.Navigation("StockExportOrders");
                 });
 #pragma warning restore 612, 618
         }
